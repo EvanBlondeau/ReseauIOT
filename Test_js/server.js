@@ -64,16 +64,63 @@ app.post("/change_time", function(req, res, next) {
   console.log(req.body.commande);
 
   var ip_client = req.body.ip_client;
-  let response = {};
-  response.command = req.body.commande;
 
+  let response = {};
   response.ip = ip_client;
+  response.command = req.body.commande;
+  
   io.sockets.emit("data_send", response);
   res.send({});
 });
 
+app.post("/chenillar", function(req, res, next) {
+  
+    let response = {};
+  switch(req.body.commande)
+  {
+    case "on_off_chen" :
+    console.log("bouton chen");
+    console.log(req.body);
+
+    console.log(req.body.ip_client);
+    console.log(req.body.commande);
+    console.log(req.body.val);
+    var ip_client = req.body.ip_client;
+    
+    response.ip = ip_client;
+    response.command = req.body.commande;
+    response.value = req.body.val;
+    console.log(response);
+
+    io.sockets.emit("data_send", response);
+    res.send({});
+    break;
+
+    case "inverser_chenillar":
+    console.log("inv chen");
+
+    console.log(req.body);
+
+    console.log(req.body.ip_client);
+    console.log(req.body.commande);
+    
+    var ip_client = req.body.ip_client;
+    
+    response.ip = ip_client;
+    response.command = req.body.commande;
+    console.log(response);
+
+    io.sockets.emit("data_send", response);
+    res.send({});
+    break;
+    
+  }
+   
+});
+
+
 app.use(function(req, res, next) {
-  res.status(404).sendFile(path.join(__dirname + "/views/404.html"));
+  res.status(404).sendFile(path.join(__dirname + "/404.html"));
 });
 
 app.use(function(req, res, next) { 

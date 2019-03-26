@@ -11,6 +11,8 @@ var temps = 1000;
 var set_chenillar=[1,2,3,4];
 var set_chenillar_inverse=[4,3,2,1];
 var chen = set_chenillar;
+var bool_chen=1;
+var i=1;
 
 process.stdin.on('data',(data) =>{
   dat = data.toString().trim();
@@ -18,14 +20,97 @@ process.stdin.on('data',(data) =>{
   switch(dat){
     case "disconect":
     connection.Disconnect();
+    process.exit();
     console.log("bye bye");
     break;
+
+    case "chen":
+      chenilar();
+      console.log("hello chen");
+    break;
+
+    case "stop":
+      chenilar();
+      console.log("hello chen");
+    break;
+
     default:
-    console.log("no");
+      console.log("impossible request");
     break;
   }
 
 });
+
+var socket = io.connect(
+  "http://localhost:3000"
+);
+
+function start_lampe(nb)
+{
+    connection.write("0/1/"+nb, 1);
+}
+
+function down_lampe(nb)
+{
+    connection.write("0/1/"+nb, 0);
+}
+
+function sleep(ms)
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function chenilar()
+{
+    while(1){
+        start_lampe(chen[0]);
+        await sleep(temps);
+        down_lampe(chen[0]);
+        start_lampe(chen[1]);
+        await sleep(temps);
+        down_lampe(chen[1]);
+        start_lampe(chen[2]);
+        await sleep(temps);
+        down_lampe(chen[2]);
+        start_lampe(chen[3]);
+        await sleep(temps);
+        down_lampe(chen[3]);
+    }
+
+}
+async function chenilar_2()
+{
+    while(1 || bool_chen){
+        start_lampe(chen[i]);
+        await sleep(temps);
+        down_lampe(chen[i]);
+        if(i>=4){i=1;}else{i++;}
+    }
+       
+}
+
+function read(type,num)
+{
+  connection.read("1/"+type+"/"+num, function (response) 
+  {
+    console.log("KNX response: %j", response);
+    return response;
+  });
+}
+
+function readall(socket)
+{ var tableau= [];
+  for(a=0;a>=4;a++)
+  {
+    connection.read("1/1/"+a, function (response)
+    {
+      console.log("KNX response: %j", response);
+      tableau.push(response); 
+    });
+  }
+  socket.emit(tableau);
+  return tableau;
+}
 
 
 
@@ -38,9 +123,8 @@ var connection = new knx.Connection( {
       connected: function() {
         console.log('Hurray, I can talk KNX!');
         // WRITE an arbitrary boolean request to a DPT1 group address
-        
+        readall();
         //chenilar();
-
 
         /*start_lampe(1); 
         start_lampe(2);
@@ -55,41 +139,9 @@ var connection = new knx.Connection( {
         down_lampe(4);
         */
 
-        function start_lampe(nb)
-        {
-            connection.write("0/1/"+nb, 1);
-        }
-
-        function down_lampe(nb)
-        {
-            connection.write("0/1/"+nb, 0);
-        }
-
-        function sleep(ms)
-        {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        async function chenilar()
-        {
-            while(1){
-                start_lampe(chen[0]);
-                await sleep(temps);
-                down_lampe(chen[0]);
-                start_lampe(chen[1]);
-                await sleep(temps);
-                down_lampe(chen[1]);
-                start_lampe(chen[2]);
-                await sleep(temps);
-                down_lampe(chen[2]);
-                start_lampe(chen[3]);
-                await sleep(temps);
-                down_lampe(chen[3]);
-            }
+        
        
-        }
-
-
+        
       },
       // get notified for all KNX events:
       event: function(evt, src, dest, value) { console.log(
@@ -129,6 +181,15 @@ var connection = new knx.Connection( {
             chen = set_chenillar;
           }
         }
+
+        if(dest == "0/3/4"){
+          console.log("arret on");
+          if(bool_chen == 0){
+            chenilar();
+            bool_chen = !bool_chen;
+          }else{bool_chen = !bool_chen;}
+          console.log("chenilar: "+bool_chen);
+        }
       },
       // get notified on connection errors
       error: function(connstatus) {
@@ -138,9 +199,7 @@ var connection = new knx.Connection( {
 });
 
 
-var socket = io.connect(
-  "http://localhost:3000"
-);
+
 let response = {};
 response.command = "send_ip";
 response.ip = myIP;
@@ -205,8 +264,19 @@ socket.on("data_send", function(data) {
         {
           chen = set_chenillar;
         }
-        console.log("time: "+temps);
+        console.log("chenillar: "+chen);
         break;
+
+    case "on_off_chen":
+        console.log("on_stop web ");
+        if(bool_chen == 0){
+          chenilar();
+          bool_chen = !bool_chen;
+        }else{bool_chen = !bool_chen;}
+        
+        console.log("chenilar: "+bool_chen);
+        break;
+
 
 
     default:
