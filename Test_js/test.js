@@ -4,11 +4,9 @@
         console.log("hi dim");
         objet = JSON.stringify({ip_client:"hello", commande:"diminuer"});
         var xhr = new XMLHttpRequest();
-        //probleme car on ne trouvait pas le serveur depuis l'appli :/
-        xhr.open("POST", "http://localhost:3000/change_time", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
 
-        //Send the proper header information along with the request
+        xhr.open("POST", "http://localhost:3000/change_time", true);
+
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
         var tiime = document.getElementById("time").textContent;
@@ -27,7 +25,6 @@
         var xhr = new XMLHttpRequest();
         //probleme car on ne trouvait pas le serveur depuis l'appli :/
         xhr.open("POST", "http://localhost:3000/change_time", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
 
         //Send the proper header information along with the request
         xhr.setRequestHeader("Content-Type", "application/json");
@@ -55,10 +52,12 @@
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
         var etat_chenillar = document.getElementById("etat_chenillar").textContent;
-        if(etat_chenillar === "état du chenillar : ?")
+        if((etat_chenillar === "état du chenillar : ?") || (etat_chenillar === "état du chenillar : false") )
         {
             document.getElementById("etat_chenillar").innerHTML = "état du chenillar : true";
-        } 
+        }else{
+            document.getElementById("etat_chenillar").innerHTML = "état du chenillar : false";
+        }
     }
 
     function inv_chen()
@@ -79,4 +78,32 @@
             document.getElementById("etat_chenillar").innerHTML = "état du chenillar : true";
         } 
     }
+    
+    var socket = io.connect(
+        "http://localhost:3000"
+        );
+
+    let response = {};
+    response.command = "etat_lampe";
+    
+    socket.emit("ip", response);
+
+    socket.on("Lampe", function(data) {
+        console.log("helloods");
+        switch (data.command) {
+            case "update_lampe":
+              console.log( data.tab_lampe);
+              
+              break;
+
+            default:
+              console.log("Command not supported by the web client");
+          
+
+        }
+    })
+
+            
+   
+
 

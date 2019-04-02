@@ -25,13 +25,20 @@ process.stdin.on('data',(data) =>{
     break;
 
     case "chen":
+      bool_chen=1;
       chenilar();
       console.log("hello chen");
     break;
 
     case "stop":
-      chenilar();
-      console.log("hello chen");
+      bool_chen=0;
+      console.log("hello stop");
+    break;
+
+    case "lampe":
+      console.log("status lampe");
+      readall();
+      
     break;
 
     default:
@@ -98,9 +105,10 @@ function read(type,num)
   });
 }
 
-function readall(socket)
-{ var tableau= [];
-  for(a=0;a>=4;a++)
+function readall()
+{ var tableau = [];
+ // socket.emit("ip","helloe");
+  for(a=1;a<=4;a++)
   {
     connection.read("1/1/"+a, function (response)
     {
@@ -108,8 +116,21 @@ function readall(socket)
       tableau.push(response); 
     });
   }
-  socket.emit(tableau);
-  return tableau;
+  if(tableau.length == 0)
+  {
+    console.log("test");
+    tableau = [1,0,1,0]; 
+    let response = {};
+    response.command = "update_lampe";
+    response.tab_lampe = tableau;
+    socket.emit("ip",response);
+  }
+  else{
+    let response = {};
+    response.command = "update_lampe";
+    response.tab_lampe = tableau;
+    socket.emit("ip",response);
+  }
 }
 
 
@@ -125,22 +146,6 @@ var connection = new knx.Connection( {
         // WRITE an arbitrary boolean request to a DPT1 group address
         readall();
         //chenilar();
-
-        /*start_lampe(1); 
-        start_lampe(2);
-        start_lampe(3);
-        start_lampe(4); 
-        
-    
-      // sleep(100);
-        down_lampe(1);
-        down_lampe(2);
-        down_lampe(3);
-        down_lampe(4);
-        */
-
-        
-       
         
       },
       // get notified for all KNX events:

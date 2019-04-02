@@ -3,13 +3,18 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+
     <title>ResIoT</title>
+
+    <script src="/socket.io/socket.io.js" charset="utf-8"></script>
+
   </head>
   <body>
     <h2>Client</h2>
+    <button type="button" onclick="connection()">connection</button> 
     <button type="button" onclick="aug()">augmenter la vitesse </button> 
-    <button type="button" onclick="dim()">diminuer la vitesse</button> 
-    <button type="button" onclick="chenillar()">lancer le chenillar</button> 
+    <button type="button" onclick="dim()">dimin uer la vitesse</button> 
+    <button type="button" onclick="chenillar()" id="bouton_chenillar">lancer chen</button> 
     <button type="button" onclick="inv_chen()">inverser le chenillar</button> 
 
     <button type="button" onclick="inv_chen()">état chenillar</button> 

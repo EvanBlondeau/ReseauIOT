@@ -12,7 +12,7 @@ const httpServer = http.createServer(app);
 
 const io = so.listen(httpServer);
 
-let myCameras = [];
+let myMaquette = [];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,18 +24,33 @@ io.on("connection", function(socket) {
 
       socket.on("ip", function(data) {
         console.log(data);
+        console.log(data.command);
          try {
           switch (data.command) {
             case "send_ip":
-              myCameras.push(data.ip);
+            myMaquette.push(data.ip);
               function onlyUnique(value, index, self) {
                 return self.indexOf(value) === index;
               }
-              myCameras = myCameras.filter(onlyUnique);
+              myMaquette = myMaquette.filter(onlyUnique);
               console.log("Connexion maquette !");
-              console.log(myCameras);
-              socket.emit("configPage", myCameras);
+              console.log(myMaquette);
+              socket.emit("configPage", myMaquette);
               break;
+
+            case "update_lampe":
+              response.command = "update_lampe";
+              response.data = data.tab_lampe
+              socket.emit("Lampe",response);
+              console.log("de");
+              break;
+
+            case "etat_lampe":
+              response.command = "update_lampe";
+              response.data = data.tab_lampe
+              socket.emit("Lampe",response);
+              break;
+
             default:
               console.log("Command not supported..");
           }
@@ -44,14 +59,13 @@ io.on("connection", function(socket) {
           console.log("Error parse JSON..");
         }
       }); 
+
 });
 
 app.use("/",express.static(__dirname + "/"));
 
 
-app
-  //page d'acceuil
-  .get("/", function(req, res) {
+app.get("/", function(req, res) {
     res.sendFile(path.join(__dirname + "/index.html"));
   })
 
@@ -118,6 +132,13 @@ app.post("/chenillar", function(req, res, next) {
    
 });
 
+app.use(
+  "/socketio",express.static(__dirname + "/node_modules/socket.io-client/dist")
+);
+
+app.use(
+  "/ip",express.static(__dirname + "/node_modules/")
+);
 
 app.use(function(req, res, next) {
   res.status(404).sendFile(path.join(__dirname + "/404.html"));
