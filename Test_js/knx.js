@@ -14,6 +14,8 @@ var chen = set_chenillar;
 var bool_chen=1;
 var i=1;
 
+var test=0;
+
 process.stdin.on('data',(data) =>{
   dat = data.toString().trim();
   console.log(dat);
@@ -37,6 +39,14 @@ process.stdin.on('data',(data) =>{
 
     case "lampe":
       console.log("status lampe");
+      test=1;
+      readall();
+      
+    break;
+
+    case "lampe":
+      console.log("status lampe");
+      test = 2;
       readall();
       
     break;
@@ -118,8 +128,13 @@ function readall()
   }
   if(tableau.length == 0)
   {
-    console.log("test");
-    tableau = [1,0,1,0]; 
+    if(test==1){
+      console.log("test");
+      tableau = [1,0,1,0]; 
+    }else{
+      console.log("test2");
+    tableau = [1,0,1,1]; 
+    }
     let response = {};
     response.command = "update_lampe";
     response.tab_lampe = tableau;
@@ -282,7 +297,10 @@ socket.on("data_send", function(data) {
         console.log("chenilar: "+bool_chen);
         break;
 
-
+    case "bonjour":
+        console.log("helmkojfdn");
+        readall();
+        break;
 
     default:
       console.log("Command not supported..");

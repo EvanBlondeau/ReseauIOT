@@ -78,6 +78,20 @@
             document.getElementById("etat_chenillar").innerHTML = "état du chenillar : true";
         } 
     }
+
+    function etat_lampe()
+    {
+        console.log("etat_lampe ??");
+        objet = JSON.stringify({ip_client:"hello", commande:"bonjour"});
+        var xhr = new XMLHttpRequest();
+        //probleme car on ne trouvait pas le serveur depuis l'appli :/
+        xhr.open("POST", "http://localhost:3000/etat_lampe", true);
+        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+
+        //Send the proper header information along with the request
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objet.toString());
+    }
     
     var socket = io.connect(
         "http://localhost:3000"
@@ -92,8 +106,11 @@
         console.log("helloods");
         switch (data.command) {
             case "update_lampe":
-              console.log( data.tab_lampe);
-              
+              console.log(data.tab_lampe);
+              for(i=0;i<data.tab_lampe.lenght;i++){
+                document.getElementById("lampe"+i).style.property = "fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" ;
+              }
+
               break;
 
             default:
@@ -104,6 +121,10 @@
     })
 
             
-   
+    function lampe_onoff(lampe)
+    {
+        document.getElementById("button_"+lampe).value="eteindre";
+        document.getElementById("lamp_on_"+lampe).src = "/lamp_on.png";
+    }
 
 
