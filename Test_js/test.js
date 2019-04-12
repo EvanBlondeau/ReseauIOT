@@ -105,10 +105,16 @@
     socket.on("Lampe", function(data) {
         console.log("helloods");
         switch (data.command) {
-            case "update_lampe":
+            case "up_lampe":
               console.log(data.tab_lampe);
-              for(i=0;i<data.tab_lampe.lenght;i++){
-                document.getElementById("lampe"+i).style.property = "fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" ;
+              if(data.value==="1"){
+                document.getElementById("button_"+data.lampe).value="eteindre";
+                document.getElementById("button_"+data.lampe).className="btn btn-danger col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+                document.getElementById("lamp_on_"+data.lampe).src = "/lamp_on.png";
+              }else if(data.value==="1"){
+                document.getElementById("button_"+data.lampe).value="allumer";
+                document.getElementById("button_"+data.lampe).className="btn btn-success col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+                document.getElementById("lamp_on_"+data.lampe).src = "/lamp_off.png";
               }
 
               break;
@@ -123,8 +129,40 @@
             
     function lampe_onoff(lampe)
     {
-        document.getElementById("button_"+lampe).value="eteindre";
-        document.getElementById("lamp_on_"+lampe).src = "/lamp_on.png";
+        v = document.getElementById("button_"+lampe).value;
+        console.log(v);
+        if(v=="allumer"){
+            objet = JSON.stringify({ip_client:"hello", commande:"lampe_onoff",lampe_nb:lampe, value:"allumer"});
+            var xhr = new XMLHttpRequest();
+            //probleme car on ne trouvait pas le serveur depuis l'appli :/
+            xhr.open("POST", "http://localhost:3000/lampe", true);
+            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+
+            //Send the proper header information along with the request
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(objet.toString());
+
+            document.getElementById("button_"+lampe).value="eteindre";
+            document.getElementById("button_"+lampe).className="btn btn-danger col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+            document.getElementById("lamp_on_"+lampe).src = "/lamp_on.png";
+
+        }
+        else{
+            objet = JSON.stringify({ip_client:"hello", commande:"lampe_onoff",lampe_nb:lampe, value:"eteindre"});
+            var xhr = new XMLHttpRequest();
+            //probleme car on ne trouvait pas le serveur depuis l'appli :/
+            xhr.open("POST", "http://localhost:3000/lampe", true);
+            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+
+            //Send the proper header information along with the request
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(objet.toString());
+
+            document.getElementById("button_"+lampe).value="allumer";
+            document.getElementById("button_"+lampe).className="btn btn-success col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+            document.getElementById("lamp_on_"+lampe).src = "/lamp_off.png";
+        }
+        
     }
 
 

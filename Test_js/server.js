@@ -61,6 +61,17 @@ io.on("connection", function(socket) {
               socket.emit("Lampe",response);
               console.log("de");
               break;
+
+            case "lampe":
+              response.command = "up_lampe";
+              response.value = data.value;
+              response.lampe = data.lampe;
+              function sockt() {
+                io.sockets.emit("Lampe",response);
+              }
+              sockt();
+              console.log("de");
+              break;
           
             default:
               console.log("Command not supported..");
@@ -112,6 +123,18 @@ app.post("/etat_lampe",function(req,res, next){
          console.log(response);
          io.sockets.emit("data_send", response);
          
+});
+
+app.post("/lampe",function(req,res, next){
+  
+  let response ={};
+  response.command = req.body.commande;
+  response.lampe = req.body.lampe_nb;
+  response.value = req.body.value;
+  console.log(response);
+  io.sockets.emit("data_send", response);
+  
+  
 });
 
 app.post("/chenillar", function(req, res, next) {

@@ -26,13 +26,21 @@ process.stdin.on('data',(data) =>{
     console.log("bye bye");
     break;
 
+    case "on":
+    start_lampe(1);
+    break;
+
+    case "on":
+    down_lampe(1);
+    break;
+
     case "chen":
       bool_chen=1;
       chenilar();
       console.log("hello chen");
     break;
 
-    case "stop":
+    case "stop_chen":
       bool_chen=0;
       console.log("hello stop");
     break;
@@ -64,12 +72,22 @@ var socket = io.connect(
 
 function start_lampe(nb)
 {
+    let resp={};
     connection.write("0/1/"+nb, 1);
+    resp.command="lampe";
+    resp.lampe=nb;
+    resp.value="1";
+    socket.emit("ip",resp);
 }
 
 function down_lampe(nb)
 {
+    let resp={};
     connection.write("0/1/"+nb, 0);
+    resp.command="lampe";
+    resp.lampe=nb;
+    resp.value="0";
+    socket.emit("ip",resp);
 }
 
 function sleep(ms)
@@ -248,6 +266,12 @@ socket.on("data_send", function(data) {
   response.command = "send_ip";
   response.ip = myIP;
   switch (data.command) {
+
+    case "lampe_onoff":
+       c = data.lampe;
+       valu = data.value;
+       console.log(c + "    "+valu);
+       break;
 
     case "diminuer":
         console.log("down web");
