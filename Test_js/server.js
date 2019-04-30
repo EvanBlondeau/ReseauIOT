@@ -12,7 +12,7 @@ const httpServer = http.createServer(app);
 
 const io = so.listen(httpServer);
 
-let myMaquette = [];
+var myMaquette = [];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,7 +22,6 @@ app.use(
   "/bootstrap",
   express.static(__dirname + "/node_modules/bootstrap/dist")
 );
-
 
 io.on("connection", function(socket) {
       let response = {};
@@ -57,20 +56,29 @@ io.on("connection", function(socket) {
             case "update_lampe":
               response.command = "update_lampe";
               console.log(data.tab_lampe);
+              response.lampe=data.ip;
               response.data = data.tab_lampe;
               socket.emit("Lampe",response);
               console.log("de");
               break;
 
             case "lampe":
+              console.log("je suis arrivé ici");
               response.command = "up_lampe";
+              response.ip_maquette = data.ip;
               response.value = data.value;
               response.lampe = data.lampe;
-              function sockt() {
-                io.sockets.emit("Lampe",response);
-              }
-              sockt();
+              io.sockets.emit("Lampe",response);
+              
               console.log("de");
+              break;
+
+            case "ip_maquette_req":
+              let rep={};
+              rep.command = "ip_maquette";
+              rep.ip_maquette = myMaquette;
+              console.log(myMaquette);
+              io.sockets.emit("Lampe",rep);
               break;
           
             default:
@@ -93,8 +101,8 @@ app.use(express.static(__dirname + "/node_modules/"));
 
   app
   //page d'acceuil
-  .get("/1", function(req, res) {
-    res.sendFile(path.join(__dirname + "/views/acceuil.html"));
+  .get("/", function(req, res) {
+    res.sendFile(path.join(__dirname + "/views/index.html"));
   })
 
 
@@ -128,6 +136,7 @@ app.post("/etat_lampe",function(req,res, next){
 app.post("/lampe",function(req,res, next){
   
   let response ={};
+  response.ip=req.body.ip_client;
   response.command = req.body.commande;
   response.lampe = req.body.lampe_nb;
   response.value = req.body.value;
