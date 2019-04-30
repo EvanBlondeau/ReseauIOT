@@ -9,8 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluetooth-hci-socket": "^0.5.1",
+    "ds4": "^1.0.0-rc1",
+    "dualshock-controller": "^1.1.1",
     "express": "^4.16.4",
     "ip": "^1.1.5",
-    "knx": "^2.3.2"
+    "knx": "^2.3.2",
+    "noble": "^1.9.1",
+    "node-bluetooth": "^1.2.5",
+    "node-web-bluetooth": "0.0.8"
   }
 }

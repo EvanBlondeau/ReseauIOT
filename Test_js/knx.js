@@ -16,9 +16,18 @@ var i=1;
 
 var test=0;
 
+var maquette= process.argv[2];
+var listen =process.argv[3];
+
+
+console.log(process.argv[2]);
+console.log(process.argv[3]);
+
+
 process.stdin.on('data',(data) =>{
+  
   dat = data.toString().trim();
-  console.log(dat);
+  //console.log(dat);
   switch(dat){
     case "disconect":
     connection.Disconnect();
@@ -28,10 +37,16 @@ process.stdin.on('data',(data) =>{
 
     case "on":
     start_lampe(1);
+    start_lampe(2);
+    start_lampe(3);
+    start_lampe(4);
     break;
 
-    case "on":
+    case "off":
     down_lampe(1);
+    down_lampe(2);
+    down_lampe(3);
+    down_lampe(4);
     break;
 
     case "chen":
@@ -74,20 +89,22 @@ function start_lampe(nb)
 {
     let resp={};
     connection.write("0/1/"+nb, 1);
+    /*resp.ip=maquette;
     resp.command="lampe";
     resp.lampe=nb;
     resp.value="1";
-    socket.emit("ip",resp);
+    socket.emit("ip",resp);*/
 }
 
 function down_lampe(nb)
 {
     let resp={};
     connection.write("0/1/"+nb, 0);
+    /*resp.ip=maquette;
     resp.command="lampe";
     resp.lampe=nb;
     resp.value="0";
-    socket.emit("ip",resp);
+    socket.emit("ip",resp);*/
 }
 
 function sleep(ms)
@@ -115,11 +132,11 @@ async function chenilar()
 }
 async function chenilar_2()
 {
-    while(1 || bool_chen){
+    while(bool_chen){
         start_lampe(chen[i]);
         await sleep(temps);
         down_lampe(chen[i]);
-        if(i>=4){i=1;}else{i++;}
+        if(i>=3){i=0;}else{i++;}
     }
        
 }
@@ -169,8 +186,8 @@ function readall()
 
 
 var connection = new knx.Connection( {
-    // ip address and port of the KNX router or interface
-    ipAddr: '192.168.0.10', ipPort: 3671,
+    // ip address and port of the KNX router or interface '192.168.0.10'
+    ipAddr: maquette, ipPort: 3671,
     
     handlers: {
       // wait for connection establishment before sending anything!
@@ -186,6 +203,44 @@ var connection = new knx.Connection( {
           "event: %s, src: %j, dest: %j, value: %j",
           evt, src, dest, value
         );
+        if(dest == "0/2/1"){
+          //{ type: 'Buffer', data: [ 1 ] }
+          let obj = JSON.parse(JSON.stringify(value));
+          let resp={};
+          resp.ip=maquette;
+          resp.command="lampe";
+          resp.lampe=1;
+          resp.value=obj.data[0];
+          socket.emit("ip",resp);
+        }
+        if(dest == "0/2/2"){
+          obj = JSON.parse(JSON.stringify(value));
+          let resp={};
+          resp.ip=maquette;
+          resp.command="lampe";
+          resp.lampe=2;
+          resp.value=obj.data[0];
+          socket.emit("ip",resp);
+        }
+        if(dest == "0/2/3"){
+          obj = JSON.parse(JSON.stringify(value));
+          let resp={};
+          resp.ip=maquette;
+          resp.command="lampe";
+          resp.lampe=3;
+          resp.value=obj.data[0];
+          socket.emit("ip",resp);
+        }
+        if(dest == "0/2/4"){
+          obj = JSON.parse(JSON.stringify(value));
+          let resp={};
+          resp.ip=maquette;
+          resp.command="lampe";
+          resp.lampe=4;
+          resp.value=obj.data[0];
+          socket.emit("ip",resp);
+        }
+        //u0000
         if(dest == "0/3/1")
         {
           console.log("down bouton");
@@ -208,15 +263,18 @@ var connection = new knx.Connection( {
           }
           console.log("time: "+temps);
         }
-
         if(dest == "0/3/3"){
           console.log("yello");
           if(chen === set_chenillar)
           {
             chen = set_chenillar_inverse;
+            let m = chen_inv(i,set_chenillar_inverse).then();
+            i = m;
           }else if(chen === set_chenillar_inverse)
           {
             chen = set_chenillar;
+            let m = chen_inv(i,set_chenillar).then();
+            i = m;
           }
         }
 
@@ -236,11 +294,21 @@ var connection = new knx.Connection( {
     }
 });
 
+function chen_inv(ite,inv_chen){
+  let val_chen = chen[ite];
+  for(k=0;k<=inv_chen.length;k++){
+    if(inv_chen[k]=val_chen)
+    {
+      return k;
+    }
+  }
+}
+
 
 
 let response = {};
 response.command = "send_ip";
-response.ip = myIP;
+response.ip = maquette;
 
 // Emission 
 socket.emit("ip", response);
@@ -250,7 +318,7 @@ socket.on("reconnection", function(data) {
   console.log(data);
   let response = {};
   response.command = "send_ip";
-  response.ip = myIP;
+  response.ip = maquette;
   switch (data.command) {
     case "sync":
       socket.emit("ip", response);
@@ -262,74 +330,80 @@ socket.on("reconnection", function(data) {
 
 socket.on("data_send", function(data) {
   console.log(data);
-  let response = {};
-  response.command = "send_ip";
-  response.ip = myIP;
-  switch (data.command) {
+  if(data.ip===maquette){
+    
+    switch (data.command) {
 
-    case "lampe_onoff":
-       c = data.lampe;
-       valu = data.value;
-       console.log(c + "    "+valu);
-       break;
-
-    case "diminuer":
-        console.log("down web");
-          if(temps == 500)
-          {
-            temps = 1000;
-            console.log(temps);
-        }else{
-            temps = temps -100;
-            console.log(temps);
-          }
-        console.log("time: "+temps);
-        break;
-
-    case "augmenter":
-        console.log("up web ");
-        if(temps == 1500)
-          {
-            temps = 1000;
-            console.log(temps);
-        }else{
-            temps = temps + 100;
-            console.log(temps);
-          }
-        console.log("time: "+temps);
-        break;
-
-    case "inverser_chenillar":
-        console.log("invers web ");
-        if(chen === set_chenillar)
+      case "lampe_onoff":
+      console.log("lampe");
+        lam = data.lampe;
+        valu = data.value;
+        if(valu === 1)
         {
-          chen = set_chenillar_inverse;
-        }else if(chen === set_chenillar_inverse)
-        {
-          chen = set_chenillar;
+          start_lampe(lam);
+        }else if(valu === 0){
+          down_lampe(lam);
         }
-        console.log("chenillar: "+chen);
         break;
 
-    case "on_off_chen":
-        console.log("on_stop web ");
-        if(bool_chen == 0){
-          chenilar();
-          bool_chen = !bool_chen;
-        }else{bool_chen = !bool_chen;}
-        
-        console.log("chenilar: "+bool_chen);
-        break;
+      case "diminuer":
+          console.log("down web");
+            if(temps == 500)
+            {
+              temps = 1000;
+              console.log(temps);
+          }else{
+              temps = temps -100;
+              console.log(temps);
+            }
+          console.log("time: "+temps);
+          break;
 
-    case "bonjour":
-        console.log("helmkojfdn");
-        readall();
-        break;
+      case "augmenter":
+          console.log("up web ");
+          if(temps == 1500)
+            {
+              temps = 1000;
+              console.log(temps);
+          }else{
+              temps = temps + 100;
+              console.log(temps);
+            }
+          console.log("time: "+temps);
+          break;
 
-    default:
-      console.log("Command not supported..");
-      break;
+      case "inverser_chenillar":
+          console.log("invers web ");
+          if(chen === set_chenillar)
+          {
+            chen = set_chenillar_inverse;
+          }else if(chen === set_chenillar_inverse)
+          {
+            chen = set_chenillar;
+          }
+          console.log("chenillar: "+chen);
+          break;
+
+      case "on_off_chen":
+          console.log("on_stop web ");
+          if(bool_chen == 0){
+            chenilar();
+            bool_chen = !bool_chen;
+          }else{bool_chen = !bool_chen;}
+          
+          console.log("chenilar: "+bool_chen);
+          break;
+
+      case "bonjour":
+          console.log("helmkojfdn");
+          readall();
+          break;
+
+      default:
+        console.log("Command not supported..");
+        break;
+    }
   }
 });
 
-server.listen(8000);
+server.listen(listen);
