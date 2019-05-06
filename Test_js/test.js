@@ -226,12 +226,12 @@
                             '<div class="mr-auto p-2" style="vertical-align: bottom;" >allumer ou eteindre la lampe n°2</div>'+
                            
                             '<span class="slidecontainer col-2" >'+
-                            '<input type="range" min="500" max="1500" value="1000" class="slider" id="'+ip_auth+'"_slider"" style="vertical-align: bottom;">'+
-                            '<span id="'+ip_auth+'"_text"></span>'+
+                            '<input type="range" min="500" max="1500" value="1000" class="slider" id="'+ip_auth+'_slider"" style="vertical-align: bottom;">'+
+                            '<span id="'+ip_auth+'_text"></span>'+
                            '<script>'+
                            
-                            'var slider = document.getElementById("'+ip_auth+'"_slider");'+
-                            'var output = document.getElementById("'+ip_auth+'"_text");'+
+                            'var slider = document.getElementById("'+ip_auth+'_slider");'+
+                            'var output = document.getElementById("'+ip_auth+'_text");'+
                             'output.innerHTML = slider.value;'+
                             'slider.oninput = function() {'+
                                 'output.innerHTML = this.value;'+   
@@ -264,7 +264,7 @@
     })
        
 
-    function    {
+    function   dd() {
 
         console.log(document.getElementById(ip+"_slider"));
 
