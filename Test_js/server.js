@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 
 const so = require("socket.io");
 
+const { exec } = require('child_process');
+
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -49,8 +52,10 @@ io.on("connection", function(socket) {
               }
               myMaquette = myMaquette.filter(onlyUnique);
               console.log("Connexion maquette !");
-              console.log(myMaquette);
-              socket.emit("configPage", myMaquette);
+              let resp = {};
+              resp.ip_maquette=myMaquette;
+              resp.command = "ip_maquette";
+              io.sockets.emit("Lampe", resp);
               break;
 
             case "update_lampe":
@@ -130,6 +135,7 @@ app.post("/etat_lampe",function(req,res, next){
          response.command = req.body.commande;
          console.log(response);
          io.sockets.emit("data_send", response);
+         res.send({});
          
 });
 
@@ -142,9 +148,29 @@ app.post("/lampe",function(req,res, next){
   response.value = req.body.value;
   console.log(response);
   io.sockets.emit("data_send", response);
+  res.send({});
   
   
 });
+
+app.post("/connection",function(req,res,next){
+  console.log("hello");
+  let port = myMaquette.length +8000;
+  console.log(port);
+  let ip_m = req.body.ip_client;
+  exec('nodejs knx.js '+ip_m+' '+port, (err, stdout, stderr) => {
+    if (err) {
+      console.log(err);
+      // node couldn't execute the command
+      return;
+    }
+  
+    // the *entire* stdout and stderr (buffered)
+    console.log(`stdout: ${stdout}`);
+    console.log(`stderr: ${stderr}`);
+  });
+  res.send({});
+})
 
 app.post("/chenillar", function(req, res, next) {
   

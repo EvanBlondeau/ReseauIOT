@@ -247,8 +247,10 @@ var connection = new knx.Connection( {
           if(temps == 500)
           {
             temps = 1000;
+            send_speed(temps);
           }else{
             temps = temps -100;
+            send_speed(temps);
           }
           console.log("time: "+temps);
         }
@@ -258,8 +260,10 @@ var connection = new knx.Connection( {
           if(temps == 1500)
           {
             temps = 1000;
+            send_speed(temps);
           }else{
             temps = temps + 100;
+            send_speed(temps);
           }
           console.log("time: "+temps);
         }
@@ -304,6 +308,15 @@ function chen_inv(ite,inv_chen){
   }
 }
 
+function send_speed(time)
+{
+    let resp={};
+    resp.ip=maquette;
+    resp.command="speed";
+    resp.speed=time;
+    socket.emit("ip",resp);
+}
+
 
 
 let response = {};
@@ -338,12 +351,29 @@ socket.on("data_send", function(data) {
       console.log("lampe");
         lam = data.lampe;
         valu = data.value;
-        if(valu === 1)
-        {
-          start_lampe(lam);
-        }else if(valu === 0){
-          down_lampe(lam);
-        }
+        if(lam === 'all'){
+          if(valu === 1)
+          {
+            console.log("hello lampe all");
+            start_lampe(0);
+            start_lampe(1);
+            start_lampe(2);
+            start_lampe(3);
+          }else if(valu === 0){
+            console.log("down lampe all");
+            down_lampe(0);
+            down_lampe(1);
+            down_lampe(2);
+            down_lampe(3);
+          }
+        }else {
+            if(valu === 1)
+            {
+              start_lampe(lam);
+            }else if(valu === 0){
+              down_lampe(lam);
+            }
+       }
         break;
 
       case "diminuer":

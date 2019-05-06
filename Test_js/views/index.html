@@ -14,7 +14,7 @@
   <script src="/socket.io/socket.io.js" charset="utf-8"></script>
 
   <!-- Custom fonts for this template-->
-  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="vendor/fontawesome-free/css/all.css" rel="stylesheet" type="text/css">
 
   <!-- Custom styles for this template-->
   <link href="css/sb-admin-2.css" rel="stylesheet">
@@ -34,9 +34,9 @@
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="acceuil.html">
           <div class="sidebar-brand-icon  ">
-            <i class="fas fa-satellite-dish  "></i>
+            <img src="/konnex_IOT.png" width="50" height="50">
           </div>
-          <div class="sidebar-brand-text mx-3">IOT network</div>
+          <div class="sidebar-text mx-3" style="font-family: URW Chancery L;font-style: cursive;">konnex ToI</div>
         </a>
   
         <!-- Divider -->
@@ -249,13 +249,25 @@
               <div class="form-group ">
                   <label for="exampleFormControlSelect1"
                     >Selectionner la maquette</label>
-                  <select class="form-control" id="button_multiple" onclick="click_menu()"> </select>
-                  
+                  <select class="form-control" id="button_multiple" >
+                   <option>
+                      192.168.2.2
+                  </option>  
+                  <option>
+                      192.168.2.1
+                  </option>  
+                  <option>
+                      192.168.2.3
+                  </option>  
+                  </select>
+                 
                 </div>
                 <button class="btn btn-dark " style="text-align:center" type="button" onclick="connection()">connection</button> 
           </div>
           </div>
         </div>
+
+        <br> 
 
         <div class="col-xl-6">
             <div class="card shadow " style="box-shadow:0 0.0rem 0.5rem 0 rgba(58, 59, 69, 0.15) !important">
@@ -273,12 +285,12 @@
           </div>
 
         </div>
-          <br> <br>
+          <br> 
+         
 
         <div id="mes_maquettes">
         </div>
 
-        <br> <br>
         
 
     
