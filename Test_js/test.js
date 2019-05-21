@@ -39,45 +39,48 @@
         document.getElementById("time").innerHTML =time;
     }
 
-    function chenillar()
+    function chenillar(ip_maquette)
     {
-        console.log("hi chenillar");
-        objet = JSON.stringify({ip_client:"hello", commande:"on_off_chen",val:"droit"});
-        var xhr = new XMLHttpRequest();
-        //probleme car on ne trouvait pas le serveur depuis l'appli :/
-        xhr.open("POST", "http://localhost:3000/chenillar", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-
-        //Send the proper header information along with the request
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(objet.toString());
-        var etat_chenillar = document.getElementById("etat_chenillar").textContent;
-        if((etat_chenillar === "état du chenillar : ?") || (etat_chenillar === "état du chenillar : false") )
-        {
-            document.getElementById("etat_chenillar").innerHTML = "état du chenillar : true";
-        }else{
-            document.getElementById("etat_chenillar").innerHTML = "état du chenillar : false";
-        }
+            v = document.getElementById(ip_maquette+"_button_chenillar").value;
+            console.log(v);
+            if(v=="lancer"){
+                objet = JSON.stringify({ip_client:ip_maquette, commande:"on_off_chen",val:true});
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/chenillar", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(objet.toString());
+                var update = new Promise(function(resolve, reject) {
+                    document.getElementById(ip_maquette+"_button_chenillar").value="stop";
+                    document.getElementById(ip_maquette+"_button_chenillar").className="btn btn-warning col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+                });
+                update.then(function() {});
+            }
+            else{
+                objet = JSON.stringify({ip_client:ip_maquette, commande:"on_off_chen",val:false});
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/chenillar", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(objet.toString());
+                var up = new Promise(function(resolve, reject) {
+                     document.getElementById(ip_maquette+"_button_chenillar").value="lancer";
+                     document.getElementById(ip_maquette+"_button_chenillar").className="btn btn-blue col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+                    });
+                    up.then(function() {});
+            }
     }
 
-    function inv_chen()
-    {
-        console.log("inv chenillar");
-        objet = JSON.stringify({ip_client:"hello", commande:"inverser_chenillar"});
-        var xhr = new XMLHttpRequest();
-        //probleme car on ne trouvait pas le serveur depuis l'appli :/
-        xhr.open("POST", "http://localhost:3000/chenillar", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+   function search_maquette(){
+            console.log("search??");
+            objet = JSON.stringify({ip_client:"hello", commande:"search_maq"});
+            var xhr = new XMLHttpRequest();
+            //probleme car on ne trouvait pas le serveur depuis l'appli :/
+            xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/search", true);
+            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
 
-        //Send the proper header information along with the request
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(objet.toString());
-        var etat_chenillar = document.getElementById("etat_chenillar").textContent;
-        if(etat_chenillar === "état du chenillar : ?")
-        {
-            document.getElementById("etat_chenillar").innerHTML = "état du chenillar : true";
-        } 
-    }
+            //Send the proper header information along with the request
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(objet.toString());
+   }
 
     function etat_lampe()
     {
@@ -85,7 +88,7 @@
         objet = JSON.stringify({ip_client:"hello", commande:"bonjour"});
         var xhr = new XMLHttpRequest();
         //probleme car on ne trouvait pas le serveur depuis l'appli :/
-        xhr.open("POST", "http://localhost:3000/etat_lampe", true);
+        xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/etat_lampe", true);
         // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
 
         //Send the proper header information along with the request
@@ -94,22 +97,60 @@
     }
     
     var socket = io.connect(
-        "http://localhost:3000"
+        window.location.protocol +"//" +window.location.hostname +":" + window.location.port
         );
 
     let response = {};
     response.command = "etat_lampe";
-    
     socket.emit("ip", response);
 
     let resp = {};
     resp.command = "ip_maquette_req";
-    
     socket.emit("ip", resp);
 
+    let re={}
+    re.command = "script_maq";
+    socket.emit("ip", re);
+
+    let rep={}
+    rep.command = "act_chen";
+    socket.emit("ip", rep);
+
     socket.on("Lampe", function(data) {
-        console.log(data.command);
+        //console.log(data.command);
         switch (data.command) {
+
+             case "activer_chen":
+             console.log(data);
+             if(data.value)
+             {
+                document.getElementById(data.ip+"_button_chenillar").value="stop";
+                document.getElementById(data.ip+"_button_chenillar").className="btn btn-warning col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+             }else{
+                document.getElementById(data.ip+"_button_chenillar").value="lancer";
+                document.getElementById(data.ip+"_button_chenillar").className="btn btn-blue col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
+             }
+             break; 
+
+             case "select_maq":
+             document.getElementById("button_multiple").innerHTML="";
+             if (data.ip.length == 0) {
+             $("#button_multiple").append("<option>Pas de maquette connectée</option>");}
+             else {
+                for (var i in data.ip) {
+                //let name = "butt_cam_" + i; 
+                let ip = data.ip[i];
+                $("#button_multiple").append('<option>'+ ip +'</option>');
+                }
+             }
+             break;
+
+             case "time_maq":
+             console.log("time " +data);
+             document.getElementById(data.ip_maquette+"_slider").value=data.value;
+             document.getElementById(data.ip_maquette+"_text").innerHTML=data.value;
+             break;
+
              case "up_lampe":
               console.log(data.ip_maquette);
               console.log(data.value);
@@ -127,25 +168,106 @@
               break;
 
               case "ip_maquette":
-              console.log("hello hello");
-              console.log(data.ip_maquette);
-              let list = document.getElementById("mes_maquettes");
-              if(document.getElementById("mes_maquettes").getElementsByTagName("div").length!=0){
-              list.innerHTML = '';
-              }
-                let name = "auth_cam_";
-                if (data.ip_maquette.length == 0) {
-                    $("#authentification_cam").append("<li class='list-group-item' >Pas d'authentification de caméra demandées</li>");
-                } else {
-                for (var i in data.ip_maquette) {
-                name = "maquette_" + i;
+             // console.log("hello hello");
+              //console.log(data.ip_maquette);
+              let data_add= [];
+              let data_remove=[]
+              let list = document.getElementsByTagName("divcard");
+              if(document.getElementById("mes_maquettes").getElementsByTagName("divcard").length!=0){
+                
+                 let div_page = [];
+                 let p =0;
+                 while(p<list.length){
+                    // console.log(list[p].id.split("_")[0]);
+                    div_page.push(list[p].id.split("_")[0]);
+                    p++;
+                 }
+                // console.log(div_page);
+                 let l=0;
+
+                    dat = data.ip_maquette;
+                    console.log("lenght div dat");
+                    console.log(dat.length);
+                    while(l<dat.length)
+                    {
+                        let essai = document.getElementById(dat[l]+"_card");
+                        if(essai==null){
+                            data_add.push(dat[l]);
+                            l++;
+                        }else{
+                        b=0;
+                        while(b<div_page.length){
                             
-                ip_auth = data.ip_maquette[i];   
+                            if(div_page[b]==dat[l]){
+                                div_page.slice(b);
+                                l++;
+                                break;
+                            }else if((b+1)==(div_page.length)){
+                                data_remove.push[b];
+                                b++;
+                            }
+                            b++;
+                            }
+                         }
+                    }
+                    /*while(l<data.ip_maquette.length){
+                         // console.log('dat : '+dat);
+                          let essai = document.getElementById(data.ip_maquette[l]+"_card");
+                          if (essai === null){
+                              data_tab.push(data.ip_maquette[l]);
+                              dat.slice(l);
+                              l++;
+                          }else{
+                              //dat.slice(l);
+                              long = div_page.length;
+                              for(var f=0;f<long;f++){
+                                  console.log(div_page[f]);
+                                  for(var b=0;b<data.ip_maquette.lenght;b++){
+                                      //console.log(data.ip_maquette[f]);
+                                      if(div_page[f]==data.ip_maquette[b]){
+                                           //div_page.slice(f);
+                                      }
+                                  }
+                              } 
+                              
+                              l++;
+                          }        
+                    }
+                    */
+                   console.log("lenght div_page");
+                    console.log(data_remove.length);
+                    if(data_remove.length!=0)
+                  {
+                      console.log("lenght div_page =0");
+                  }
+              }else{
+                data_add=data.ip_maquette;
+              }
+              console.log("lenght fini");
+              console.log(data_add.length);
+                let name = "auth_cam_";
+                if (data.ip_maquette.length === 0) {
+                    document.getElementById("mes_maquettes").innerHTML="";     
+                } else {
+                for (var i in data_add) {
+                ip_auth = data_add[i];
+                ip_sl = data_add[i]
+                ip_sl = escapeRegExp(ip_sl);
+               // console.log(ip_sl);
+                name = "maquette_"+ ip_sl ;         
+            
                 tout = "all";       
                 $("#mes_maquettes").append(
-                   '<div class="card shadow" style="box-shadow:0 0.0rem 0.5rem 0 rgba(58, 59, 69, 0.15) !important">'+
-                   '<div class="card-header py-3">'+
-                       ' <h6 class="m-0 font-weight-bold text-dark">'+ip_auth+' </h6>'+
+                   '<divcard class="card shadow" id="'+ip_auth+'_card" style="box-shadow:0 0.0rem 0.5rem 0 rgba(58, 59, 69, 0.15) !important">'+
+                   '<div class="card-header py-3 d-flex flex-row ">'+
+                       ' <h6 class="m-0 mr-auto p-2 font-weight-bold text-dark">'+ip_auth+' </h6>'+
+
+                       '<button class="btn btn-light" style="width:10px; height:32px; margin-right:5px;" id="'+ip_auth+'_button_deco" onclick="parametre_maquette(\'' + ip_auth + '\')">'+
+                       '<i class="fas fa-fw fa-cog" id="'+ip_auth+'_parametre" style="  width:5px;  right: 7px; bottom: 2px;position: relative;"></i></button>'+
+
+                       '<button class="btn btn-danger" style="width:10px; height:32px;" id="'+ip_auth+'_button_deco" onclick="deco_maq(\'' + ip_auth + '\')">'+
+                       '<i class="fas fa-fw fa-times" id="'+ip_auth+'_croix" style="width:5px;  right: 6px; bottom: 2px;position: relative;"></i></button>'+
+                          
                     '</div>'+
                 '<div class="col-xl-12 form-group card-body" style="text-align: center">'+
                   
@@ -203,7 +325,7 @@
                       '<li class="list-group-item " >'+
                           '<div class="d-flex flex-row col-xl-12 col-lg-12 col-md-12 ">'+
                           '<div class="mr-auto p-2">Gestion de la maquette</div>'+
-                          ' <button class="btn" data-toggle="collapse" id="'+ip_auth+'_collaps_2" onclick="angle_up(\'' + ip_auth + '\',2)" data-target="#Chen_'+name+'" aria-expanded="false" aria-controls="collapseExample">'+
+                          ' <button class="btn" data-toggle="collapse" id="'+ip_auth+'_collaps_2"  aria-pressed="false" onclick="angle_up(\'' + ip_auth + '\',2)" data-target="#Chen_'+name+'" aria-expanded="false" aria-controls="collapseExample">'+
                           '<i class="fas fa-fw fa-angle-down" id="'+ip_auth+'_angle_2" ></i>'+
                           '</button>'+       
                           '</div>'+
@@ -212,13 +334,16 @@
                       '<li class="list-group-item " >'+
                          '<div class="d-flex flex-row col-xl-12 col-lg-12 col-md-12 ">'+
                             '<div class="mr-auto p-2">allumer ou eteindre le chenillar</div>'+
-                            '<input class="btn btn-success  col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3" id="'+ip_auth+'_button_chenillar" type="button" value="lancer" onclick="chenillar(\'' + ip_auth + '\')"/>'+
+                            '<input class="btn btn-blue  col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3" id="'+ip_auth+'_button_chenillar" type="button" value="lancer" onclick="chenillar(\'' + ip_auth + '\')"/>'+
                         '</div>'+
                      '</li>'+
                       '<li class="list-group-item " >'+
                          '<div class="d-flex flex-row col-xl-12 col-lg-12 col-md-12 ">'+
                             '<div class="mr-auto p-2">Inverser le chenillar</div>'+
-                            '<input class="btn btn-success  col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3" id="'+ip_auth+'_bouton_inv_chen" type="button" value="allumer" onclick="inv_chen(\'' + ip_auth + '\')"/>'+
+                           '  <label class="switch">'+
+                            '<input id="'+ip_auth+'_toggle" type="checkbox" onclick="inv_chen(\'' + ip_auth + '\')">'+
+                           '<span class="sli round"></span>'+
+                         '</label>'+
                         '</div>'+
                      '</li>'+
                      '<li class="list-group-item" >'+
@@ -226,53 +351,271 @@
                             '<div class="mr-auto p-2" style="vertical-align: bottom;" >allumer ou eteindre la lampe n°2</div>'+
                            
                             '<span class="slidecontainer col-2" >'+
-                            '<input type="range" min="500" max="1500" value="1000" class="slider" id="'+ip_auth+'_slider"" style="vertical-align: bottom;">'+
+                            '<input type="range" min="500" max="1500" value="1000" class="slider" id="'+ip_auth+'_slider"  onchange="changetime(\'' + ip_auth + '\')" style="vertical-align: bottom;">'+
                             '<span id="'+ip_auth+'_text"></span>'+
                            '<script>'+
                            
-                            'var slider = document.getElementById("'+ip_auth+'_slider");'+
-                            'var output = document.getElementById("'+ip_auth+'_text");'+
-                            'output.innerHTML = slider.value;'+
-                            'slider.oninput = function() {'+
-                                'output.innerHTML = this.value;'+   
+                            'var slider_'+i+' = document.getElementById("'+ip_auth+'_slider");'+
+                            'var output_'+i+' = document.getElementById("'+ip_auth+'_text");'+
+                            'output_'+i+'.innerHTML = slider_'+i+'.value;'+
+                            'slider_'+i+'.oninput = function() {'+
+                                'output_'+i+'.innerHTML = this.value;'+   
                             '}'+
                             '</script>'+
                             '</span>'+
-                 
                          '</div>'+
                        '</li>'+
                        '</div>'+
                     '</ul>'+
-
                       '</div>'+
-                    
-                 
-                '</div><br>'
-
+                '</divcard><br>'
                 );
                 }
             } 
+            document.getElementById("multi_maquette_1").innerHTML="";
+            document.getElementById("multi_maquette_2").innerHTML="";
 
+            if (data.ip_maquette.length == 0) {
+                $("#multi_maquette_1").append("<option>Pas de maquette connectée</option>");
+                $("#multi_maquette_2").append("<option>Pas de maquette connectée</option>");}
+                else {
+                   for (var i in data.ip_maquette) {
+                   //let name = "butt_cam_" + i; 
+                   let ip = data.ip_maquette[i];
+                   $("#multi_maquette_1").append('<option>'+ ip +'</option>');
+                   $("#multi_maquette_2").append('<option>'+ ip +'</option>');
+                   }
+            }
               break;
 
-
-            default:
+              default:
               console.log("Command not supported by the web client");
           
 
         }
     })
        
+    function parametre_maquette(ip){
+        let ipconcat=escapeRegExp(ip);
+        name_modal="modal_param_maquette"+ipconcat;
+        name_param=ip+"_param_maquette";
 
-    function   dd() {
+        $("#mes_maquettes").append(
+            '<div class="modal fade  bd-example-modal-lg" id="'+name_modal+'" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"> '+
+            '<div class="modal-dialog modal-lg modal-dialog-centered" role="document">'+
+             ' <div class="modal-content">'+
+               ' <div class="modal-header">'+
+                 ' <h5 class="modal-title" id="exampleModalCenterTitle">'+"Paramètre de la maquette "+ip+'</h5>'+
+                 '<button type="button" class="close" data-dismiss="modal" aria-label="Close">'+
+                 '  <span aria-hidden="true">&times;</span>'+
+                 '</button>'+
+                 '</div>'+
+                 '<div class="modal-body">'+
+                 '<div class="col-12 row">'+
+                ' <div class="input-group col-6 ">'+
+                 '<input type="text" id="'+name_param+'" class="form-control" placeholder="nouveau model du chenillar" aria-label="Username" aria-describedby="basic-addon1">'+
+               '</div>'+
+               ' <div class="col-5 ">'+
+               '<span class="form-control" style="border:0px">ex:1,4,4,3,2,3,1</span>'+
+                 '</div>'+
+                 '</div>'+
+                 '</div>'+
+                 '<div class="modal-footer">'+
+                 ' <button type="button" class="btn btn-secondary" data-dismiss="modal" >page précédente</button>'+
+                 ' <button type="button" class="btn btn-success" data-dismiss="modal" onclick="send_new_param(\'' + ip + '\')">valider</button>'+
+                 '</div>'+
+                 ' </div>'+
+                 ' </div>'+
+                 ' </div>'+
+                 '<script>$("#'+name_modal+'").modal("show")</script>'
+                 );
+        
+    }
 
-        console.log(document.getElementById(ip+"_slider"));
 
-        objet = JSON.stringify({ip_client:ip_maquette, commande:"time"});
+    function send_new_param(ip){
+        new_chen = document.getElementById(ip+"_param_maquette").value;
+        
+
+        let tab_para=[];
+        let tab_para2=[];
+        for(let o =0;o<new_chen.length;o++){
+            if(new_chen[o]===","){}
+            else{
+            if((Number(new_chen[o]))<(Number(5)))
+            {
+                tab_para.push(Number(new_chen[o]));
+                tab_para2.push(Number(new_chen[o]));
+            }
+            else{console.log("nop" + new_chen[0]);}
+            }
+        }
+        new_chen_reverse = tab_para2.reverse(); 
+        console.log(tab_para);
+        console.log(tab_para2);
+
+        objet = JSON.stringify({ip_client:ip, commande:"new_chennillar", valeur_chen:tab_para,valeur_inv:new_chen_reverse});
         var xhr = new XMLHttpRequest();
+        //probleme car on ne trouvait pas le serveur depuis l'appli :/
+        xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/new_chennillar", true);
+        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+        //Send the proper header information along with the request
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objet.toString());
 
-        xhr.open("POST", "http://localhost:3000/change_time", true);
+    }
 
+    function multi_chen(){
+        chen_1 = document.getElementById("multi_maquette_1").value;
+        chen_2 = document.getElementById("multi_maquette_2").value;
+        console.log(chen_1 +" "+ chen_2);
+        if(chen_1!=chen_2){
+            console.log("hello");
+            param_multi(chen_1,chen_2);
+
+            /*objet = JSON.stringify({ip_client:select, commande:"connecton_maquette"});
+            var xhr = new XMLHttpRequest();
+            //probleme car on ne trouvait pas le serveur depuis l'appli :/
+            xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/connection", true);
+            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+            console.log(objet);
+            //Send the proper header information along with the request
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(objet.toString());*/
+        }else{
+        myFunction("Attention ! il faut choisir deux maquettes différentes !");   
+
+       
+    }
+}
+
+    function param_multi(ip_1,ip_2){
+        let ipconcat=escapeRegExp(ip_1);
+        let ipconcat2=escapeRegExp(ip_2);
+        mop = ipconcat+"_param_"+ipconcat2;
+        name_modal="modal_param_";
+        
+        name_param=ip_1+"_param_"+ip_2;
+        $("#mes_maquettes").append(
+            '<div class="modal fade  bd-example-modal-lg" id="'+name_modal+'" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"> '+
+            '<div class="modal-dialog modal-lg modal-dialog-centered" role="document">'+
+             ' <div class="modal-content">'+
+               ' <div class="modal-header">'+
+                 ' <h5 class="modal-title" id="exampleModalCenterTitle">'+"Paramètre de la caméra "+'</h5>'+
+                 '<button type="button" class="close" data-dismiss="modal" aria-label="Close">'+
+                 '  <span aria-hidden="true">&times;</span>'+
+                 '</button>'+
+                 '</div>'+
+                 '<div class="modal-body">'+
+                 '<div class="col-xl-12" style="text-align:center;">'+
+                 '<span class="col-1">'+
+                 '<img class="col-1"  width="200"  src="/lamp_off.png">'+
+                    '<img class="col-1"  width="200" src="/lamp_off.png">'+
+                   '<img class="col-1"  width="200" src="/lamp_off.png">'+
+                    '<img class=" col-1"  width="200" src="/lamp_off.png"> '+
+                    '<span class="col-2">'+
+                    '<img class="col-1"  width="200"  src="/lamp_off.png">'+
+                    '<img class=" col-1"  width="200" src="/lamp_off.png">'+
+                   '<img class=" col-1"   width="200" src="/lamp_off.png">'+
+                    '<img class=" col-1"   width="200" src="/lamp_off.png"> '+
+                    '<span class="col-1">'+
+                 '</div>'+
+                 '<br>'+
+                 '<div class="row col-12">'+
+                '<span class="slidecontainer col-5" >'+
+                '<input type="range" min="500" max="1500" value="1000" class="slider form-groupe" width="500px" id="'+mop+'_slider" style="vertical-align: middle;">'+
+                
+                '</span>'+
+                    '<span class ="col-2"  id="'+mop+'_text"></span>'+
+                    '<script>'+
+                
+                    'var slider_'+mop+' = document.getElementById("'+mop+'_slider");'+
+                    'var output_'+mop+' = document.getElementById("'+mop+'_text");'+
+                    'output_'+mop+'.innerHTML = slider_'+mop+'.value;'+
+                    'slider_'+mop+'.oninput = function() {'+
+                        'output_'+mop+'.innerHTML = this.value;'+   
+                    '}'+
+                    '</script>'+
+
+                '</div>'+
+                '<br>'+
+                 '<div class="col-12 row">'+
+                ' <div class="input-group col-6 ">'+
+                 '<input type="text" id="'+name_param+'" class="form-control" placeholder="model du chenillar" aria-label="Username" aria-describedby="basic-addon1">'+
+               '</div>'+
+               ' <div class="col-5 ">'+
+               '<span class="form-control" style="border:0px">ex:1,2,8,6,4,2,3</span>'+
+                 '</div>'+
+                 '</div>'+
+                 '</div>'+
+                 '<div class="modal-footer">'+
+                 ' <button type="button" class="btn btn-secondary" data-dismiss="modal" >page précédente</button>'+
+                 ' <button type="button" class="btn btn-success" data-dismiss="modal" onclick="send_param_multi(\'' + ip_1 + '\',\'' + ip_2 + '\',\'' + name_param + '\',\'' + mop + '\')">valider</button>'+
+                 '</div>'+
+                 ' </div>'+
+                 ' </div>'+
+                 ' </div>'+
+                 '<script>$("#'+name_modal+'").modal("show")</script>'
+                 );
+      }
+      
+    function send_param_multi(ip1,ip2,inp,slider)
+    {   
+        let slid = document.getElementById(slider+'_slider').value;
+        console.log(slid);
+        let str = document.getElementById(inp).value;
+        console.log(str);
+        let tab_para=[];
+        for(let o =0;o<str.length;o++){
+            if(str[o]===","){}
+            else{
+            if((Number(str[o]))<(Number(9)))
+            {
+                tab_para.push(Number(str[o]));
+            }
+            else{console.log("nop" + str[0]);}
+            }
+        }
+        console.log(ip1+ ip2+ tab_para);        
+
+        objet = JSON.stringify({ip_1:ip1,ip_2:ip2, commande:"multi_chen", valeur:tab_para,time:slid});
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/multi_chenillar", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objet.toString());
+
+    }
+       
+    function myFunction(str) {
+        var x = document.getElementById("snackbar");
+        x.innerHTML=str;
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+      }
+
+    function inv_chen(ip_maquette)
+    {
+        console.log("inv chenillar");
+        val = document.getElementById(ip_maquette+"_toggle").checked;
+        console.log(val);
+        objet = JSON.stringify({ip_client:ip_maquette, commande:"inverser_chenillar", valeur:val});
+        var xhr = new XMLHttpRequest();
+        //probleme car on ne trouvait pas le serveur depuis l'appli :/
+        xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/chenillar", true);
+        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+        //Send the proper header information along with the request
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objet.toString());
+    }
+
+
+    function changetime(ip) {
+
+        v= document.getElementById(ip+"_slider").value;
+        console.log(v);
+        objet = JSON.stringify({ip_client:ip,value:v,commande:"time"});
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/change_time", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
     }
@@ -280,15 +623,30 @@
     
     function angle_up(ip,numb){
         angle = document.getElementById(ip+"_angle_"+numb);
-    
         val = document.getElementById(ip+"_collaps_"+numb).getAttribute("aria-expanded");
-       
         if(val==="false"){
             document.getElementById(ip+"_angle_"+numb).className="fas fa-fw fa-angle-up";
         }else if(val==='true'){
             document.getElementById(ip+"_angle_"+numb).className="fas fa-fw fa-angle-down";
         }
     }
+
+    function escapeRegExp(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, ""); // $& means the whole matched string
+      }
+
+    function deco_maq(ip) {
+               objet = JSON.stringify({ip_client:ip, commande:"disc"});
+               console.log(objet);
+                var xhr = new XMLHttpRequest();
+                //probleme car on ne trouvait pas le serveur depuis l'appli :/
+                xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/deconnection", true);
+                // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+    
+                //Send the proper header information along with the request
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(objet.toString());
+     }
 
     function lampe_onoff(lampe,ip_maquette)
     {   
@@ -299,7 +657,7 @@
                 objet = JSON.stringify({ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:1});
                 var xhr = new XMLHttpRequest();
                 //probleme car on ne trouvait pas le serveur depuis l'appli :/
-                xhr.open("POST", "http://localhost:3000/lampe", true);
+                xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/lampe", true);
                 // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
     
                 //Send the proper header information along with the request
@@ -321,7 +679,7 @@
                 objet = JSON.stringify({ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:0});
                 var xhr = new XMLHttpRequest();
                 //probleme car on ne trouvait pas le serveur depuis l'appli :/
-                xhr.open("POST", "http://localhost:3000/lampe", true);
+                xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/lampe", true);
                 // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
     
                 //Send the proper header information along with the request
@@ -336,27 +694,22 @@
                     });
                     up.then(function() {});
             }
-        
-        
-        
     }
 
     function connection()
     {
-
         console.log("hleooooooooooo");
         select = document.getElementById("button_multiple").value;
 
         objet = JSON.stringify({ip_client:select, commande:"connecton_maquette"});
             var xhr = new XMLHttpRequest();
             //probleme car on ne trouvait pas le serveur depuis l'appli :/
-            xhr.open("POST", "http://localhost:3000/connection", true);
+            xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/connection", true);
             // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
             console.log(objet);
             //Send the proper header information along with the request
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(objet.toString());
-
     }
 
 

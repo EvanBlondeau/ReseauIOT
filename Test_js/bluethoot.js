@@ -3,8 +3,11 @@ var player = require('play-sound')(opts = {});
 
 var bluetoothHciSocket = new BluetoothHciSocket();
 
+
+var audio;
+var i = 0;
 bluetoothHciSocket.on('data', function(data) {
-  //  console.log('data: ' + data.toString('hex') + ', ' + data.length + ' bytes');
+   console.log('data: ' + data.toString('hex') + ', ' + data.length + ' bytes');
 
   buf=data.toString('hex');
 
@@ -56,19 +59,28 @@ bluetoothHciSocket.on('data', function(data) {
   //batteryShort1: buf[12] & 0x0f,
   //batteryShort2: buf[12] & 0xf0,
   //batteryLevel= buf[12]});
-  var audio ;
-  if(trackPadTouch0Id === 2){
-    audio = player.play('Papa.mp3', function(err){
-      if (err) throw err
-    })
+  
+  if((trackPadTouch0Id === 2 )&&(i==0)){
+    i++;
+     audio = player.play('Papa.mp3', function(err){
+      if (err && !err.killed) throw err
+    });
+
+    
   }else if(trackPadTouch0Id === 4){
+    i=0;
+   try{
+    audio.kill();
+   }catch(e){
+     console.log(e);
+   }
    
-    audio.kill()
   }
-console.log({
+/*console.log({
   trackPadTouch0Id,
   trackPadTouch0X
-});/*leftAnalogX: buf[1],
+});*/
+/*leftAnalogX: buf[1],
   leftAnalogY: buf[2],
   rightAnalogX: buf[3],
   rightAnalogY: buf[4],
@@ -233,7 +245,7 @@ console.log({
       console.log('\t' + handle);
       console.log('\t' + data.toString('hex'));
 
-      disconnectConnection(handle, HCI_OE_USER_ENDED_CONNECTION);
+    // disconnectConnection(handle, HCI_OE_USER_ENDED_CONNECTION);
     }
   }
 });
@@ -340,7 +352,7 @@ function writeHandle(handle, data) {
   bluetoothHciSocket.write(cmd);
 }
 
-function disconnectConnection(handle, reason) {
+/*function disconnectConnection(handle, reason) {
   var cmd = new Buffer(7);
 
   // header
@@ -355,6 +367,6 @@ function disconnectConnection(handle, reason) {
   cmd.writeUInt8(reason, 6); // reason
 
   bluetoothHciSocket.write(cmd);
-}
+}*/
 
 createConnection('dc:0b:86:95:e8:a5', 'random');

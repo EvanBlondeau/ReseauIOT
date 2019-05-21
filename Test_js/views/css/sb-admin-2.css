@@ -115,6 +115,10 @@ dl {
   margin-bottom: 1rem;
 }
 
+divd{
+  
+}
+
 ol ol,
 ul ul,
 ol ul,
@@ -2863,6 +2867,12 @@ fieldset:disabled a.btn {
   color: #fff;
   background-color: #5a5c69;
   border-color: #5a5c69;
+}
+
+.btn-blue {
+  color: #fff;
+  background-color: #233055;
+  border-color: #233055;
 }
 
 .btn-dark:hover {
