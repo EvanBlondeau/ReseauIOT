@@ -42,7 +42,6 @@
     function chenillar(ip_maquette)
     {
             v = document.getElementById(ip_maquette+"_button_chenillar").value;
-            console.log(v);
             if(v=="lancer"){
                 objet = JSON.stringify({ip_client:ip_maquette, commande:"on_off_chen",val:true});
                 var xhr = new XMLHttpRequest();
@@ -70,27 +69,23 @@
     }
 
    function search_maquette(){
-            console.log("search??");
             objet = JSON.stringify({ip_client:"hello", commande:"search_maq"});
             var xhr = new XMLHttpRequest();
             //probleme car on ne trouvait pas le serveur depuis l'appli :/
             xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/search", true);
-            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-
             //Send the proper header information along with the request
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(objet.toString());
+
+            myFunction_green("Le serveur recherche les maquettes disponible");
    }
 
     function etat_lampe()
     {
-        console.log("etat_lampe ??");
         objet = JSON.stringify({ip_client:"hello", commande:"bonjour"});
         var xhr = new XMLHttpRequest();
         //probleme car on ne trouvait pas le serveur depuis l'appli :/
         xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/etat_lampe", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-
         //Send the proper header information along with the request
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
@@ -117,7 +112,6 @@
     socket.emit("ip", rep);
 
     socket.on("Lampe", function(data) {
-        //console.log(data.command);
         switch (data.command) {
 
              case "activer_chen":
@@ -146,15 +140,13 @@
              break;
 
              case "time_maq":
-             console.log("time " +data);
+             console.log(data);
              document.getElementById(data.ip_maquette+"_slider").value=data.value;
              document.getElementById(data.ip_maquette+"_text").innerHTML=data.value;
              break;
 
              case "up_lampe":
-              console.log(data.ip_maquette);
-              console.log(data.value);
-              console.log(data.lampe);
+              console.log(data);
               if(data.value===1){
                 document.getElementById(data.ip_maquette+"_button_"+data.lampe).value="eteindre";
                 document.getElementById(data.ip_maquette+"_button_"+data.lampe).className="btn btn-danger col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
@@ -168,8 +160,6 @@
               break;
 
               case "ip_maquette":
-             // console.log("hello hello");
-              //console.log(data.ip_maquette);
               let data_add= [];
               let data_remove=[]
               let list = document.getElementsByTagName("divcard");
@@ -178,15 +168,11 @@
                  let div_page = [];
                  let p =0;
                  while(p<list.length){
-                    // console.log(list[p].id.split("_")[0]);
                     div_page.push(list[p].id.split("_")[0]);
                     p++;
                  }
-                // console.log(div_page);
                  let l=0;
-
                     dat = data.ip_maquette;
-                    console.log("lenght div dat");
                     console.log(dat.length);
                     while(l<dat.length)
                     {
@@ -210,40 +196,11 @@
                             }
                          }
                     }
-                    /*while(l<data.ip_maquette.length){
-                         // console.log('dat : '+dat);
-                          let essai = document.getElementById(data.ip_maquette[l]+"_card");
-                          if (essai === null){
-                              data_tab.push(data.ip_maquette[l]);
-                              dat.slice(l);
-                              l++;
-                          }else{
-                              //dat.slice(l);
-                              long = div_page.length;
-                              for(var f=0;f<long;f++){
-                                  console.log(div_page[f]);
-                                  for(var b=0;b<data.ip_maquette.lenght;b++){
-                                      //console.log(data.ip_maquette[f]);
-                                      if(div_page[f]==data.ip_maquette[b]){
-                                           //div_page.slice(f);
-                                      }
-                                  }
-                              } 
-                              
-                              l++;
-                          }        
-                    }
-                    */
-                   console.log("lenght div_page");
                     console.log(data_remove.length);
-                    if(data_remove.length!=0)
-                  {
-                      console.log("lenght div_page =0");
-                  }
+                    if(data_remove.length!=0){}
               }else{
                 data_add=data.ip_maquette;
               }
-              console.log("lenght fini");
               console.log(data_add.length);
                 let name = "auth_cam_";
                 if (data.ip_maquette.length === 0) {
@@ -253,9 +210,7 @@
                 ip_auth = data_add[i];
                 ip_sl = data_add[i]
                 ip_sl = escapeRegExp(ip_sl);
-               // console.log(ip_sl);
                 name = "maquette_"+ ip_sl ;         
-            
                 tout = "all";       
                 $("#mes_maquettes").append(
                    '<divcard class="card shadow" id="'+ip_auth+'_card" style="box-shadow:0 0.0rem 0.5rem 0 rgba(58, 59, 69, 0.15) !important">'+
@@ -380,7 +335,6 @@
                 $("#multi_maquette_2").append("<option>Pas de maquette connectée</option>");}
                 else {
                    for (var i in data.ip_maquette) {
-                   //let name = "butt_cam_" + i; 
                    let ip = data.ip_maquette[i];
                    $("#multi_maquette_1").append('<option>'+ ip +'</option>');
                    $("#multi_maquette_2").append('<option>'+ ip +'</option>');
@@ -436,7 +390,6 @@
     function send_new_param(ip){
         new_chen = document.getElementById(ip+"_param_maquette").value;
         
-
         let tab_para=[];
         let tab_para2=[];
         for(let o =0;o<new_chen.length;o++){
@@ -451,14 +404,10 @@
             }
         }
         new_chen_reverse = tab_para2.reverse(); 
-        console.log(tab_para);
-        console.log(tab_para2);
-
         objet = JSON.stringify({ip_client:ip, commande:"new_chennillar", valeur_chen:tab_para,valeur_inv:new_chen_reverse});
         var xhr = new XMLHttpRequest();
         //probleme car on ne trouvait pas le serveur depuis l'appli :/
         xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/new_chennillar", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
         //Send the proper header information along with the request
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
@@ -468,25 +417,41 @@
     function multi_chen(){
         chen_1 = document.getElementById("multi_maquette_1").value;
         chen_2 = document.getElementById("multi_maquette_2").value;
-        console.log(chen_1 +" "+ chen_2);
         if(chen_1!=chen_2){
-            console.log("hello");
             param_multi(chen_1,chen_2);
-
-            /*objet = JSON.stringify({ip_client:select, commande:"connecton_maquette"});
-            var xhr = new XMLHttpRequest();
-            //probleme car on ne trouvait pas le serveur depuis l'appli :/
-            xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/connection", true);
-            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-            console.log(objet);
-            //Send the proper header information along with the request
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.send(objet.toString());*/
         }else{
         myFunction("Attention ! il faut choisir deux maquettes différentes !");   
-
-       
     }
+}
+
+function enable_multi_maquette(){
+            v = document.getElementById("bouton_multi").className;
+            if(v=="fas fa-check fa-sm"){
+                objet = JSON.stringify({commande:"bouton_mul", value:1});
+                var xhr = new XMLHttpRequest();
+                //probleme car on ne trouvait pas le serveur depuis l'appli :/
+                xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/but_multi", true);
+                //Send the proper header information along with the request
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(objet.toString());
+                var update = new Promise(function(resolve, reject) { 
+                    document.getElementById("bouton_multi").className="fas fa-times fa-sm";
+                    });
+                  update.then(function() {});
+            }
+            else{
+                objet = JSON.stringify({commande:"bouton_mul", value:0});
+                var xhr = new XMLHttpRequest();
+                //probleme car on ne trouvait pas le serveur depuis l'appli :/
+                xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/but_multi", true);
+                //Send the proper header information along with the request
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(objet.toString());
+                var up = new Promise(function(resolve, reject) {
+                    document.getElementById("bouton_multi").className="fas fa-check fa-sm";
+                    });
+                    up.then(function() {});
+            }
 }
 
     function param_multi(ip_1,ip_2){
@@ -507,18 +472,19 @@
                  '</button>'+
                  '</div>'+
                  '<div class="modal-body">'+
-                 '<div class="col-xl-12" style="text-align:center;">'+
-                 '<span class="col-1">'+
-                 '<img class="col-1"  width="200"  src="/lamp_off.png">'+
-                    '<img class="col-1"  width="200" src="/lamp_off.png">'+
-                   '<img class="col-1"  width="200" src="/lamp_off.png">'+
-                    '<img class=" col-1"  width="200" src="/lamp_off.png"> '+
-                    '<span class="col-2">'+
-                    '<img class="col-1"  width="200"  src="/lamp_off.png">'+
-                    '<img class=" col-1"  width="200" src="/lamp_off.png">'+
-                   '<img class=" col-1"   width="200" src="/lamp_off.png">'+
-                    '<img class=" col-1"   width="200" src="/lamp_off.png"> '+
-                    '<span class="col-1">'+
+                 '<div class="col-xl-12 col-12" style="text-align:center;">'+
+                 '<span class="col-xl-1 col-1">'+
+                 
+                 '<img class="col-xl-1 col-2"  width="200" style=" min-width: 8%;" src="/lamp_off.png">'+
+                    '<img class="col-xl-1 col-2  width="200"  style=" min-width: 8%;" src="/lamp_off.png">'+
+                   '<img class="col-xl-1 col-2 width="200" style=" min-width: 8%;" src="/lamp_off.png">'+
+                    '<img class="col-xl-1 col-2 width="200"style=" min-width: 8%;" src="/lamp_off.png"> '+
+                    '<span class="col-xl-2 col-4">'+
+                    '<img class="col-xl-1 col-2"  width="200" style=" min-width: 8%;"  src="/lamp_off.png">'+
+                    '<img class="col-xl-1 col-2"  width="200" style=" min-width: 8%;" src="/lamp_off.png">'+
+                   '<img class=" col-xl-1 col-2"  width="200" style=" min-width: 8%;" src="/lamp_off.png">'+
+                    '<img class="col-xl-1 col-2"  width="200" style=" min-width: 8%;"  src="/lamp_off.png"> '+
+                    '<span class="col-xl-1 col-1">'+
                  '</div>'+
                  '<br>'+
                  '<div class="row col-12">'+
@@ -562,9 +528,7 @@
     function send_param_multi(ip1,ip2,inp,slider)
     {   
         let slid = document.getElementById(slider+'_slider').value;
-        console.log(slid);
         let str = document.getElementById(inp).value;
-        console.log(str);
         let tab_para=[];
         for(let o =0;o<str.length;o++){
             if(str[o]===","){}
@@ -583,11 +547,19 @@
         xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/multi_chenillar", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
-
     }
        
     function myFunction(str) {
         var x = document.getElementById("snackbar");
+        x.style="background: firebrick;"
+        x.innerHTML=str;
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+      }
+
+    function myFunction_green(str) {
+        var x = document.getElementById("snackbar");
+        x.style="background: rgb(41, 168, 10);"
         x.innerHTML=str;
         x.className = "show";
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
@@ -595,14 +567,11 @@
 
     function inv_chen(ip_maquette)
     {
-        console.log("inv chenillar");
         val = document.getElementById(ip_maquette+"_toggle").checked;
-        console.log(val);
         objet = JSON.stringify({ip_client:ip_maquette, commande:"inverser_chenillar", valeur:val});
         var xhr = new XMLHttpRequest();
         //probleme car on ne trouvait pas le serveur depuis l'appli :/
         xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/chenillar", true);
-        // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
         //Send the proper header information along with the request
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(objet.toString());
@@ -610,9 +579,7 @@
 
 
     function changetime(ip) {
-
         v= document.getElementById(ip+"_slider").value;
-        console.log(v);
         objet = JSON.stringify({ip_client:ip,value:v,commande:"time"});
         var xhr = new XMLHttpRequest();
         xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/change_time", true);
@@ -637,12 +604,9 @@
 
     function deco_maq(ip) {
                objet = JSON.stringify({ip_client:ip, commande:"disc"});
-               console.log(objet);
                 var xhr = new XMLHttpRequest();
                 //probleme car on ne trouvait pas le serveur depuis l'appli :/
                 xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/deconnection", true);
-                // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-    
                 //Send the proper header information along with the request
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.send(objet.toString());
@@ -650,38 +614,29 @@
 
     function lampe_onoff(lampe,ip_maquette)
     {   
-            console.log(lampe);
             v = document.getElementById(ip_maquette+"_button_"+lampe).value;
-            console.log(v);
             if(v=="allumer"){
                 objet = JSON.stringify({ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:1});
                 var xhr = new XMLHttpRequest();
                 //probleme car on ne trouvait pas le serveur depuis l'appli :/
                 xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/lampe", true);
-                // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-    
                 //Send the proper header information along with the request
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.send(objet.toString());
                 var update = new Promise(function(resolve, reject) {
-                    
                     document.getElementById(ip_maquette+"_button_"+lampe).value="eteindre";
                     document.getElementById(ip_maquette+"_button_"+lampe).className="btn btn-danger col-xl-2 col-lg-2 col-md-2 col-sm-3 col-3";
                     if(lampe!="all"){
                     document.getElementById(ip_maquette+"_lamp_on_"+lampe).src = "/lamp_on.png";
                     }
                     });
-                  update.then(function() {});
-                   
-                  
+                  update.then(function() {});       
             }
             else{
                 objet = JSON.stringify({ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:0});
                 var xhr = new XMLHttpRequest();
                 //probleme car on ne trouvait pas le serveur depuis l'appli :/
                 xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/lampe", true);
-                // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-    
                 //Send the proper header information along with the request
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.send(objet.toString());
@@ -698,14 +653,11 @@
 
     function connection()
     {
-        console.log("hleooooooooooo");
         select = document.getElementById("button_multiple").value;
-
         objet = JSON.stringify({ip_client:select, commande:"connecton_maquette"});
             var xhr = new XMLHttpRequest();
             //probleme car on ne trouvait pas le serveur depuis l'appli :/
             xhr.open("POST",  window.location.protocol +"//" +window.location.hostname +":" + window.location.port+"/connection", true);
-            // xhr.setRequestHeader( 'Access-Control-Allow-Origin', '*');
             console.log(objet);
             //Send the proper header information along with the request
             xhr.setRequestHeader("Content-Type", "application/json");

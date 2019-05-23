@@ -9,7 +9,6 @@ const so = require("socket.io");
 
 const { exec } = require('child_process');
 
-
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -42,15 +41,7 @@ io.on("connection", function(socket) {
               respon.command = "bonjour";
               console.log(respon);
               socket.to('myMaquette').emit("reconncetion",respon);
-              console.log("de");
               break;
-
-           /* case "script_maq":
-              var maq = script_maquette_detection();
-              console.log(maq);
-              let rs={};
-              rs.ip=maq;
-              break;*/
 
               case "act_chen":
               let responf ={};
@@ -69,7 +60,6 @@ io.on("connection", function(socket) {
 
               case "script_maq":
               var maq = myMaquette_non_connecter;
-              console.log(maq);
               let rs={};
               rs.ip=maq;
               rs.command="select_maq";
@@ -82,7 +72,6 @@ io.on("connection", function(socket) {
                 return self.indexOf(value) === index;
               }
               myMaquette = myMaquette.filter(onlyUnique);
-              console.log("Connexion maquette uppp !");
               console.log(myMaquette);
               let resp = {};
               resp.ip_maquette=myMaquette;
@@ -100,13 +89,11 @@ io.on("connection", function(socket) {
               break;
 
             case "lampe":
-              console.log("je suis arrivé ici");
               response.command = "up_lampe";
               response.ip_maquette = data.ip;
               response.value = data.value;
               response.lampe = data.lampe;
               io.sockets.emit("Lampe",response);
-              console.log("de");
               break;
 
             case "ip_maquette_req":
@@ -138,13 +125,7 @@ io.on("connection", function(socket) {
 
 
       socket.on("disconnect", function(data) {
-        console.log("hello bande de putes");
-       /* let ip_camera_disco = socket.request.connection._peername.address.split(
-          ":"
-        )[3];
-        console.log(
-          "IP de la maquette déconnectée : " + ip_camera_disco
-        );*/
+        console.log("Déconnection d'une maquette(s)");
         var cam_up = new Promise(function(resolve, reject) {
           myMaquette=[];
           let response = {};
@@ -155,7 +136,6 @@ io.on("connection", function(socket) {
           resolve("sucess");
         });
         cam_up.then(function() {
-          console.log(myMaquette.length);
           if(myMaquette.length===0){
             let resp = {};
             resp.ip_maquette=myMaquette;
@@ -163,21 +143,10 @@ io.on("connection", function(socket) {
             io.sockets.emit("Lampe", resp);
           }
         });
-          
-
-        /* let resp = {};
-          resp.ip_maquette=myMaquette;
-          resp.command = "ip_maquette";
-          io.sockets.emit("Lampe", resp);
-
-          */
-       
       });
 });
 
 app.use("/",express.static(__dirname + "/"));
-
-
 
 app.use(express.static(__dirname + "/views/"));
 app.use(express.static(__dirname + "/node_modules/"));
@@ -190,12 +159,7 @@ app.use(express.static(__dirname + "/node_modules/"));
 
 
 app.post("/new_chennillar", function(req, res, next) {
-    console.log("Test du boutton");
     console.log(req.body);
-    console.log(req.body.ip_client);
-    console.log(req.body.commande);
-    console.log(req.body.valeur_chen);
-    console.log(req.body.valeur_inv);
     let response = {};
     response.ip = req.body.ip_client;
     response.command = req.body.commande;
@@ -204,15 +168,9 @@ app.post("/new_chennillar", function(req, res, next) {
     io.sockets.emit("data_send", response);
     res.send({});
 });
-  
-
 
 app.post("/change_time", function(req, res, next) {
-  console.log("Test du boutton");
   console.log(req.body);
-  console.log(req.body.ip_client);
-  console.log(req.body.commande);
-  console.log(req.body.value);
   let response = {};
   response.ip = req.body.ip_client;
   response.command = req.body.commande;
@@ -222,6 +180,7 @@ app.post("/change_time", function(req, res, next) {
 });
 
 app.post("/etat_lampe",function(req,res, next){
+         console.log(req.body);
          let response ={};
          response.command = req.body.commande;
          console.log(response);
@@ -230,6 +189,7 @@ app.post("/etat_lampe",function(req,res, next){
 });
 
 app.post("/deconnection",function(req,res, next){
+  console.log(req.body);
   let response ={};
   response.ip = req.body.ip_client;
   response.command = req.body.commande;
@@ -238,8 +198,8 @@ app.post("/deconnection",function(req,res, next){
   res.send({});
 });
 
-
 app.post("/lampe",function(req,res, next){
+  console.log(req.body);
   let response ={};
   response.ip=req.body.ip_client;
   response.command = req.body.commande;
@@ -252,21 +212,29 @@ app.post("/lampe",function(req,res, next){
 
 app.post("/multi_chenillar",function(req,res, next){
     res.send({});
-    console.log(req.body.ip_1);
-    console.log(req.body.ip_2);
-    console.log(req.body.valeur);
-    console.log(req.body.time);
+    console.log(req.body);
 
   if(req.body.commande==="multi_chen"){
-    console.log("ttt");
     chen_multi_maquette(req.body.ip_1,req.body.ip_2,req.body.valeur,req.body.time);
   }
+});
+
+var chen_multi=false;
+app.post("/but_multi",function(req,res, next){
+  if(req.body.value == 1){
+    chen_multi=true;
+  }else {
+    chen_multi=false;
+  }
+  console.log(chen_multi);
+  res.send({});
 });
 
 async function chen_multi_maquette(ip1,ip2,tab_chen,tim)
 {
   let response={};
-    for(var p=0;p<tab_chen.length;p++){
+  while(chen_multi){
+    for(var p=0;(p<tab_chen.length)&&(chen_multi);p++){
       if(tab_chen[p]<5)
       {
         console.log("ggggg");
@@ -304,6 +272,7 @@ async function chen_multi_maquette(ip1,ip2,tab_chen,tim)
         io.sockets.emit("data_send", response);
       }
     }
+  }
 }
 
 function sleep(ms)
@@ -313,10 +282,9 @@ function sleep(ms)
 
 var o = 0
 app.post("/connection",function(req,res,next){
-  console.log("hello");
+  console.log(req.body);
   let port =o+8000;
   o++;
-  console.log(port);
   let ip_m = req.body.ip_client;
   exec('nodejs knx.js '+ip_m+' '+port, (err, stdout, stderr) => {
     if (err) {
@@ -330,17 +298,14 @@ app.post("/connection",function(req,res,next){
 })
 
 app.post("/search",function(req,res, next){
+  console.log(req.body);
   res.send({});
-
 if(req.body.commande==="search_maq"){
-  console.log("masqq");
-  
   script_maquette_detection();
 }
 });
 
 function script_maquette_detection(){
-
   var d  = new Promise(function (resolve, reject) {
     exec("sudo nmap --script knx-gateway-discover -e wlan0", (err, stdout, stderr) => {
       if (err) {
@@ -351,19 +316,15 @@ function script_maquette_detection(){
     });
   });
   d.then(function(res){
-    let tryd = JSON.parse(JSON.stringify(res));
-    let dd = tryd.stdout;
-    console.log(dd);
-    let ff = dd.split("knx-gateway-discover:");
-    console.log(ff[1]);
+    let result_detection = JSON.parse(JSON.stringify(res));
+    let res_stdout = result_detection.stdout;
+    let ff = res_stdout.split("knx-gateway-discover:");
     let tab_ma=[];
     let ip_n = ff[1].split('|');
     for(g=1;g<ip_n.length;g=g+14){
-      console.log(g);
       try{
         let ty = ip_n[g].trim();
         let pus = ty.split(':');
-        console.log(pus[0].length);
         if((pus[0].length)<(16))
         {
           tab_ma.push(pus[0]);
@@ -374,18 +335,13 @@ function script_maquette_detection(){
       }
     }
     console.log(tab_ma);
-
     myMaquette_non_connecter = tab_ma;
-
     let rs={};
     rs.ip=myMaquette_non_connecter;
     rs.command="select_maq";
     io.sockets.emit("Lampe",rs);
     
   });
-
-  
-  
 }
 
 app.post("/chenillar", function(req, res, next) {
@@ -394,34 +350,21 @@ app.post("/chenillar", function(req, res, next) {
   switch(req.body.commande)
   {
     case "on_off_chen" :
-      console.log("bouton chen");
       console.log(req.body);
-
-      console.log(req.body.ip_client);
-      console.log(req.body.commande);
-      console.log(req.body.val);
       var ip_client = req.body.ip_client;
-      
       response.ip = ip_client;
       response.command = req.body.commande;
       response.value = req.body.val;
       console.log(response);
-
       io.sockets.emit("data_send", response);
       res.send({});
       break;
 
     case "inverser_chenillar":
-      console.log("inv chen");
-
-     // console.log(req.body);
-      
       response.ip = req.body.ip_client;
       response.command = req.body.commande;
       response.valeur=req.body.valeur;
-
       console.log(response);
-
       io.sockets.emit("data_send", response);
       res.send({});
       break;
@@ -429,11 +372,6 @@ app.post("/chenillar", function(req, res, next) {
   }
    
 });
-
-
-
-
-
 
 app.use(
   "/socketio",express.static(__dirname + "/node_modules/socket.io-client/dist")
@@ -443,9 +381,9 @@ app.use(
   "/ip",express.static(__dirname + "/node_modules/")
 );
 
-app.use(function(req, res, next) {
+/*app.use(function(req, res, next) {
   res.status(404).sendFile(path.join(__dirname + "/views/404.html"));
-});
+});*/
 
 app.use(function(req, res, next) { 
     res.header('Access-Control-Allow-Origin', "*"); 
@@ -455,16 +393,19 @@ app.use(function(req, res, next) {
     })
 
 
+// Partie Bluetototh
 
     var BluetoothHciSocket = require('bluetooth-hci-socket');
     var player = require('play-sound')(opts = {});
     
     var bluetoothHciSocket = new BluetoothHciSocket();
     
-    
-    var audio;
     var i = 0;
+    var vol_aug=0;
+    var act_tout=0;
+    var act_jura=0;
     bluetoothHciSocket.on('data', function(data) {
+      //voir toutes les datas
       // console.log('data: ' + data.toString('hex') + ', ' + data.length + ' bytes');
     
       buf=data.toString('hex');
@@ -514,89 +455,80 @@ app.use(function(req, res, next) {
     
       timestamp= buf[7] >> 2;
       battery= buf[12];
-      //batteryShort1: buf[12] & 0x0f,
-      //batteryShort2: buf[12] & 0xf0,
-      //batteryLevel= buf[12]});
       
+
+    //gestion des events sur les boutons
       if((trackPadTouch0Id === 2 )&&(i==0)){
         i++;
-        //objet = JSON.stringify({ip_client:ip_maquette, commande:"on_off_chen",val:true});
-        
         response={};
         response.ip = myMaquette[0];
         response.command = "on_off_chen";
         response.value = true;
         console.log(response);
-
         io.sockets.emit("data_send", response);
-
         
-      }else if(trackPadTouch0Id === 4){
+      }else if((trackPadTouch0Id === 6) &&(i==1)){
         i=0;
         response={};
         response.ip = myMaquette[0];
         response.command = "on_off_chen";
         response.value = false;
         console.log(response);
-
+        io.sockets.emit("data_send", response); 
+      }
+      else if((trackPadTouch0Id === 0) &&(vol_aug==0)){
+        vol_aug++;
+        let response = {};
+        response.ip = myMaquette[0];
+        response.command = "time";
+        response.value = 1500;
         io.sockets.emit("data_send", response);
-       
+      }
+      else if((trackPadTouch0Id === 4) &&(vol_aug==1)){
+        vol_aug=0;
+        let response = {};
+        response.ip =  myMaquette[0];
+        response.command = "time";
+        response.value = 500;
+        io.sockets.emit("data_send", response);
+      }
+      else if((trackPadTouch0X==256)&&(act_tout==0))
+      {
+        // ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:1});
+        act_tout++;
+        let response ={};
+        response.ip= myMaquette[0];
+        response.command = "lampe_onoff";
+        response.lampe = "all";
+        response.value = 1;
+        io.sockets.emit("data_send", response);
+      }
+      else if((trackPadTouch0X==512)&&(act_tout==1))
+      {
+        // ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:1});
+        act_tout=0;
+        let response ={};
+        response.ip= myMaquette[0];
+        response.command = "lampe_onoff";
+        response.lampe = "all";
+        response.value = 0;
+        io.sockets.emit("data_send", response);
+      }
+      else if((trackPadTouch0X==1024)&&(act_jura==0))
+      {
+        // ip_client:ip_maquette, commande:"lampe_onoff",lampe_nb:lampe, value:1});
+        act_jura=1;
+        let response ={};
+        response.ip= myMaquette[0];
+        response.command = "chenillar_hbo";
+        
+        response.value = 1;
+        io.sockets.emit("data_send", response);
       }
     /*console.log({
       trackPadTouch0Id,
       trackPadTouch0X
     });*/
-    /*leftAnalogX: buf[1],
-      leftAnalogY: buf[2],
-      rightAnalogX: buf[3],
-      rightAnalogY: buf[4],
-      l2Analog: buf[8],
-      r2Analog: buf[9],
-    
-      dPadUp:    dPad === 0 || dPad === 1 || dPad === 7,
-      dPadRight: dPad === 1 || dPad === 2 || dPad === 3,
-      dPadDown:  dPad === 3 || dPad === 4 || dPad === 5,
-      dPadLeft:  dPad === 5 || dPad === 6 || dPad === 7,
-    
-      cross: (buf[5] & 32) !== 0,
-      circle: (buf[5] & 64) !== 0,
-      square: (buf[5] & 16) !== 0,
-      triangle: (buf[5] & 128) !== 0,
-    
-      l1: (buf[6] & 0x01) !== 0,
-      l2: (buf[6] & 0x04) !== 0,
-      r1: (buf[6] & 0x02) !== 0,
-      r2: (buf[6] & 0x08) !== 0,
-      l3: (buf[6] & 0x40) !== 0,
-      r3: (buf[6] & 0x80) !== 0,
-    
-      share: (buf[6] & 0x10) !== 0,
-      options: (buf[6] & 0x20) !== 0,
-      trackPadButton: (buf[7] & 2) !== 0,
-      psButton: (buf[7] & 1) !== 0,
-    
-      // ACCEL/GYRO
-    
-    
-      // TRACKPAD
-      trackPadTouch0Id: buf[35] & 0x7f,
-      trackPadTouch0Active: (buf[35] >> 7) === 0,
-      trackPadTouch0X: ((buf[37] & 0x0f) << 8) | buf[36],
-      trackPadTouch0Y: buf[38] << 4 | ((buf[37] & 0xf0) >> 4),
-    
-      trackPadTouch1Id: buf[39] & 0x7f,
-      trackPadTouch1Active: (buf[39] >> 7) === 0,
-      trackPadTouch1X: ((buf[41] & 0x0f) << 8) | buf[40],
-      trackPadTouch1Y: buf[42] << 4 | ((buf[41] & 0xf0) >> 4),
-    
-      timestamp: buf[7] >> 2});
-      //battery: buf[12],
-      //batteryShort1: buf[12] & 0x0f,
-      //batteryShort2: buf[12] & 0xf0,
-    //batteryLevel: buf[12]});
-      
-      //console.log({r1: (buf[6] & 0x02) !== 0,
-       // r2: (buf[6] & 0x08) !== 0,});
       /*
       console.log({
         leftAnalogX: buf[1],

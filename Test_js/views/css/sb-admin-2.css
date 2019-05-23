@@ -631,6 +631,10 @@ pre code {
   padding-left: 0.75rem;
 }
 
+div-title{
+  font-size: 1.5rem;
+}
+
 .col {
   -ms-flex-preferred-size: 0;
   flex-basis: 0;
@@ -867,6 +871,9 @@ pre code {
 }
 
 @media (min-width: 576px) {
+  div-title{
+    font-size: 1.5rem;
+  }
   .col-sm {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;
@@ -1068,6 +1075,9 @@ pre code {
 }
 
 @media (min-width: 768px) {
+  div-title{
+    font-size: 1.5rem;
+  }
   .col-md {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;
@@ -1269,6 +1279,9 @@ pre code {
 }
 
 @media (min-width: 992px) {
+  div-title{
+    font-size: 2rem;
+  }
   .col-lg {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;
@@ -1470,6 +1483,9 @@ pre code {
 }
 
 @media (min-width: 1200px) {
+  div-title{
+    font-size: 2rem;
+  }
   .col-xl {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;

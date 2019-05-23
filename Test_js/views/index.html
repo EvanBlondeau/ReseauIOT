@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Konnex IoT</title>
+  <title>Konnex ToI</title>
 
   <script src="/socket.io/socket.io.js" charset="utf-8"></script>
 
@@ -24,120 +24,34 @@
 
 </head>
 
-<body id="page-top">
+<body id="page-top" class="sidebar-toggled">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
 
      <!-- Sidebar -->
-     <ul class="navbar-nav bg-gradient-dark sidebar sidebar-dark accordion" id="accordionSidebar">
+     <ul class="navbar-nav bg-gradient-dark sidebar sidebar-dark accordion toggled" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="acceuil.html">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center my-4" href="index.html">
           <div class="sidebar-brand-icon  ">
-            <img src="/konnex_IOT.png" width="50" height="50">
+            <img src="/konnex_IOT.png" width="100" height="100" >
           </div>
-          <div class="sidebar-text mx-3" style="text-transform: capitalize;">Konnex ToI</div>
         </a>
   
         <!-- Divider -->
-        <hr class="sidebar-divider my-0">
+        <hr class="sidebar-divider my-0" >
   
         <!-- Nav Item - Dashboard -->
-        <li class="nav-item active">
+        <li class="nav-item active" >
           <a class="nav-link" href="acceuil.html">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Home</span></a>
+            <i class="fas fa-fw fa-home" ></i>
+            <span>Acceuil</span></a>
         </li>
   
         <!-- Divider -->
         <hr class="sidebar-divider">
-  
-        <!-- Heading -->
-        <div class="sidebar-heading">
-          Account page
-        </div>
-  
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-            <i class="fas fa-fw fa-cog"></i>
-            <span>Account page</span>
-          </a>
-          <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-              
-              <h6 class="collapse-header">Login Screens:</h6>
-              <a class="collapse-item" href="login.html">Login</a>
-              <a class="collapse-item" href="register.html">Register</a>
-              <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-  
-             
-            </div>
-          </div>
-        </li>
-  
-        <!-- Nav Item - Utilities Collapse Menu -->
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
-            <i class="fas fa-fw fa-wrench"></i>
-            <span>Utilities</span>
-          </a>
-          <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Custom Utilities:</h6>
-              <a class="collapse-item" href="utilities-color.html">Colors</a>
-              <a class="collapse-item" href="utilities-border.html">Borders</a>
-              <a class="collapse-item" href="utilities-animation.html">Animations</a>
-              <a class="collapse-item" href="utilities-other.html">Other</a>
-            </div>
-          </div>
-        </li>
-  
-        <!-- Divider -->
-        <hr class="sidebar-divider">
-  
-        <!-- Heading -->
-        <div class="sidebar-heading">
-          Addons
-        </div>
-  
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-folder"></i>
-            <span>Pages</span>
-          </a>
-            <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Custom Components:</h6>
-                <a class="collapse-item" href="buttons.html">Buttons</a>
-                <a class="collapse-item" href="cards.html">Cards</a>
-                <div class="collapse-divider"></div>
-                <h6 class="collapse-header">Other Pages:</h6>
-                <a class="collapse-item" href="404.html">404 Page</a>
-                <a class="collapse-item" href="blank.html">Blank Page</a>
-              </div>
-            </div>
-        </li>
-  
-        <!-- Nav Item - Charts -->
-        <li class="nav-item">
-          <a class="nav-link" href="charts.html">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Charts</span></a>
-        </li>
-  
-        <!-- Nav Item - Tables -->
-        <li class="nav-item">
-          <a class="nav-link" href="tables.html">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Tables</span></a>
-        </li>
-  
-        <!-- Divider -->
-        <hr class="sidebar-divider d-none d-md-block">
-  
+
         <!-- Sidebar Toggler (Sidebar) -->
         <div class="text-center d-none d-md-inline">
           <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -161,43 +75,11 @@
             <i class="fa fa-bars"></i>
           </button>
 
-          <!-- Topbar Search -->
-          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-            <div class="input-group">
-              <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-              <div class="input-group-append">
-                <button class="btn btn-blue" type="button" onclick="search_maquette()">
-                  <i class="fas fa-search fa-sm"></i>
-                </button>
-              </div>
-            </div>
-          </form>
+          <div-title style="margin-top:5px; margin-left:10px; font-family:sans-serif; font-weight: bold;">Konnex ToI</div-title>
 
+       
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
-
-            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-            <li class="nav-item dropdown no-arrow d-sm-none">
-              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-search fa-fw"></i>
-              </a>
-              <!-- Dropdown - Messages -->
-              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
-                <form class="form-inline mr-auto w-100 navbar-search">
-                  <div class="input-group">
-                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" type="button" onclick="search_maquette()">
-                        <i class="fas fa-search fa-sm"></i>
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </li>
-
-            <!-- Nav Item - Alerts -->
-            
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -205,7 +87,7 @@
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">Evan Blondeau</span>
-                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                <img class="img-profile rounded-circle" width="70" height="70" src="logo_smart_camera.png ">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -238,13 +120,15 @@
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Page client KNX</h1>
 
           <div class="row">
           <div class="col-xl-6" style="margin-bottom:5px">
           <div class="card shadow " style="box-shadow:0 0.0rem 0.5rem 0 rgba(58, 59, 69, 0.15) !important">
-              <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-dark">Connection à une maquette </h6>
+              <div class="card-header d-flex flex-row py-2">
+                  <h6 class=" m-0 mr-auto p-2 font-weight-bold text-dark">Connection à une maquette </h6>
+                  <button class="btn btn-light" style="width:10px; height:32px;  margin-right:5px;" type="button" onclick="search_maquette()">
+                    <i class="fas fa-search fa-sm" style="  width:5px;  right: 7px; bottom: 2px;position: relative;"></i>
+                  </button>
               </div>
           <div class="col-xl-12 form-group card-body"  >
               <div class="form-group ">
@@ -258,15 +142,15 @@
           </div>
           </div>
         </div>
-
         <br> 
-
-       
 
         <div class="col-xl-6" >
             <div class="card shadow " style="box-shadow:0 0.0rem 0.5rem 0 rgba(58, 59, 69, 0.15) !important">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-dark">Chenillar Multi-maquette</h6>
+                <div class="card-header d-flex flex-row py-2">
+                    <h6 class="m-0 mr-auto p-2 font-weight-bold text-dark">Chenillar Multi-maquette</h6>
+                    <button class="btn btn-light" style="width:10px; height:32px;  margin-right:5px;" type="button" onclick="enable_multi_maquette()">
+                      <i id="bouton_multi" class="fas fa-check fa-sm" style="  width:5px;  right: 7px; bottom: 2px;position: relative;"></i>
+                    </button>
                 </div>
             <div class="row form-group card-body " >
               <div class="form-group col-xl-6 ">
@@ -293,15 +177,13 @@
 
         </div>
           <br> 
-         
 
         <div id="mes_maquettes">
           
         </div>
         <div id="snackbar" style="background: firebrick;"></div>
         </div>
-        <!-- /.container-fluid -->
-
+      
       </div>
       <!-- End of Main Content -->
 
@@ -309,7 +191,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; IOT KNX project</span>
+            <span>N'hésite pas à rentrer dans la lumière. Et surtout Konnex ToI</span>
           </div>
         </div>
       </footer>
